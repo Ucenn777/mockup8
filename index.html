@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokoKu - Dashboard Penjual</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f5f5;
+}
+
+/* Header */
+
+header{
+background:#ee4d2d;
+display:flex;
+align-items:center;
+gap:10px;
+padding:12px;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+color:white;
+}
+
+.search{
+flex:1;
+padding:10px;
+border:none;
+border-radius:6px;
+outline:none;
+}
+
+.icon{
+font-size:22px;
+color:white;
+cursor:pointer;
+}
+
+/* Banner */
+
+.banner{
+padding:10px;
+}
+
+.banner img{
+width:100%;
+height:180px;
+border-radius:10px;
+object-fit:cover;
+}
+
+/* Kategori */
+
+.kategori{
+display:flex;
+overflow-x:auto;
+gap:10px;
+padding:10px;
+background:white;
+}
+
+.kategori::-webkit-scrollbar{
+display:none;
+}
+
+.kategori button{
+border:none;
+background:#ffe6df;
+color:#ee4d2d;
+padding:8px 16px;
+border-radius:20px;
+font-weight:bold;
+cursor:pointer;
+white-space:nowrap;
+}
+
+/* Produk */
+
+.produk{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:12px;
+padding:12px;
+}
+
+.card{
+background:white;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-3px);
+}
+
+.card img{
+width:100%;
+height:180px;
+object-fit:cover;
+}
+
+.info{
+padding:10px;
+}
+
+.nama{
+font-size:15px;
+font-weight:bold;
+height:40px;
+overflow:hidden;
+}
+
+.harga{
+margin-top:6px;
+font-size:20px;
+font-weight:bold;
+color:#ee4d2d;
+}
+
+.rating{
+margin-top:5px;
+font-size:12px;
+color:#ff9800;
+}
+
+.aksi{
+display:flex;
+gap:5px;
+margin-top:10px;
+}
+
+.edit,.hapus{
+flex:1;
+border:none;
+padding:8px;
+border-radius:5px;
+color:white;
+cursor:pointer;
+}
+
+.edit{
+background:#f59e0b;
+}
+
+.hapus{
+background:#ef4444;
+}
+
+/* Responsive HP */
+
+@media(max-width:768px){
+
+header{
+flex-wrap:wrap;
+}
+
+.logo{
+width:100%;
+text-align:center;
+}
+
+.search{
+width:100%;
+}
+
+.banner img{
+height:130px;
+}
+
+.produk{
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.card img{
+height:140px;
+}
+
+.nama{
+font-size:13px;
+}
+
+.harga{
+font-size:17px;
+}
+
+.rating{
+font-size:11px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">🛒 TokoKu</div>
+
+<input class="search" type="text" placeholder="Cari produk...">
+
+<div class="icon">🔔</div>
+
+<div class="icon">🛒</div>
+
+</header>
+
+<div class="banner">
+
+<img src="https://picsum.photos/1000/300">
+
+</div>
+
+<div class="kategori">
+
+<button>Elektronik</button>
+<button>Gaming</button>
+<button>Fashion</button>
+<button>Sepatu</button>
+<button>Aksesoris</button>
+<button>Promo</button>
+
+</div>
+
+<div class="produk">
+<div class="card">
+<img src="https://images.unsplash.com/photo-1527814050087-3793815479db?w=600">
+<div class="info">
+<div class="nama">Mouse Gaming RGB</div>
+<div class="harga">Rp149.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 4.9 • 1,2RB Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=600">
+<div class="info">
+<div class="nama">Keyboard Mechanical RGB</div>
+<div class="harga">Rp289.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 4.8 • 900 Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600">
+<div class="info">
+<div class="nama">Headset Gaming</div>
+<div class="harga">Rp399.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 4.9 • 2RB Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600">
+<div class="info">
+<div class="nama">Samsung Galaxy A25</div>
+<div class="harga">Rp3.499.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 5.0 • 700 Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600">
+<div class="info">
+<div class="nama">Smartwatch Pro</div>
+<div class="harga">Rp899.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 4.8 • 1RB Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600">
+<div class="info">
+<div class="nama">Sepatu Sneakers</div>
+<div class="harga">Rp459.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 4.9 • 3RB Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600">
+<div class="info">
+<div class="nama">Laptop Gaming</div>
+<div class="harga">Rp12.999.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 5.0 • 350 Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600">
+<div class="info">
+<div class="nama">Power Bank 20.000mAh</div>
+<div class="harga">Rp199.000</div>
+<div class="rating">⭐⭐⭐⭐⭐ 4.7 • 4RB Terjual</div>
+<div class="aksi">
+<button class="edit">Edit</button>
+<button class="hapus">Hapus</button>
+</div>
+</div>
+</div>
+</div>
+
+<div style="padding:15px;display:flex;gap:10px;">
+
+<button id="tambah" style="flex:1;padding:12px;background:#ee4d2d;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold;">
++ Tambah Produk
+</button>
+
+</div>
+
+<script>
+
+let produk=document.querySelector(".produk");
+
+// Cari Produk
+document.querySelector(".search").addEventListener("keyup",function(){
+
+let keyword=this.value.toLowerCase();
+
+document.querySelectorAll(".card").forEach(function(card){
+
+let nama=card.querySelector(".nama").innerText.toLowerCase();
+
+card.style.display=nama.includes(keyword)?"block":"none";
+
+});
+
+});
+
+// Edit Produk
+function aktifkanEdit(){
+
+document.querySelectorAll(".edit").forEach(function(btn){
+
+btn.onclick=function(){
+
+let card=this.closest(".card");
+
+let nama=card.querySelector(".nama");
+
+let harga=card.querySelector(".harga");
+
+let namaBaru=prompt("Nama Produk",nama.innerText);
+
+if(namaBaru){
+nama.innerText=namaBaru;
+}
+
+let hargaBaru=prompt("Harga Produk",harga.innerText.replace("Rp","").replace(/\./g,""));
+
+if(hargaBaru){
+harga.innerText="Rp"+Number(hargaBaru).toLocaleString("id-ID");
+}
+
+simpan();
+
+};
+
+});
+
+}
+
+// Hapus Produk
+function aktifkanHapus(){
+
+document.querySelectorAll(".hapus").forEach(function(btn){
+
+btn.onclick=function(){
+
+if(confirm("Hapus produk ini?")){
+
+this.closest(".card").remove();
+
+simpan();
+
+}
+
+};
+
+});
+
+}
+
+// Simpan ke Local Storage
+function simpan(){
+
+localStorage.setItem("produk",produk.innerHTML);
+
+}
+
+// Ambil Data
+if(localStorage.getItem("produk")){
+
+produk.innerHTML=localStorage.getItem("produk");
+
+}
+
+// Aktifkan tombol
+aktifkanEdit();
+aktifkanHapus();
+
+document.getElementById("tambah").onclick=function(){
+
+let nama=prompt("Nama Produk");
+
+if(!nama)return;
+
+let harga=prompt("Harga Produk");
+
+if(!harga)return;
+
+let gambar=prompt("Link Gambar Produk");
+
+if(!gambar){
+gambar="https://picsum.photos/400?random="+Math.random();
+}
+
+produk.innerHTML+=`
+
+<div class="card">
+
+<img src="${gambar}">
+
+<div class="info">
+
+<div class="nama">${nama}</div>
+
+<div class="harga">Rp${Number(harga).toLocaleString("id-ID")}</div>
+
+<div class="rating">⭐⭐⭐⭐⭐ Produk Baru</div>
+
+<div class="aksi">
+
+<button class="edit">Edit</button>
+
+<button class="hapus">Hapus</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+aktifkanEdit();
+aktifkanHapus();
+simpan();
+
+};
+
+</script>
+
+</body>
+</html>
