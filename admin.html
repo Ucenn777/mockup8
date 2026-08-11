@@ -208,7 +208,7 @@
             </ul>
         </div>
         <div class="sidebar-bottom">
-            <a href="customer.html">🚪 Keluar (Logout)</a>
+            <a href="customer.html">🚪 Ke Halaman Customer</a>
         </div>
     </div>
 
@@ -373,7 +373,13 @@
                 localStorage.setItem('toko_products', JSON.stringify(DEFAULT_PRODUCTS));
                 return DEFAULT_PRODUCTS;
             }
-            return JSON.parse(stored); 
+            try {
+                let parsed = JSON.parse(stored);
+                if(!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PRODUCTS;
+                return parsed;
+            } catch(e) {
+                return DEFAULT_PRODUCTS;
+            }
         }
 
         function saveProducts(p) { 
@@ -467,7 +473,8 @@
                 let firstMedia = mediaList[0];
                 let mediaElement = "";
 
-                if(firstMedia.type === 'video' || (firstMedia.url && firstMedia.url.includes('.mp4'))) {
+                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video')));
+                if(isVideo) {
                     mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;"></video>`;
                 } else {
                     mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
@@ -644,13 +651,11 @@
             try {
                 let mediaList = [];
                 
-                // Proses file dari galeri (jika ada)
                 for(let file of files) {
                     let compressedUrl = await compressImage(file);
                     mediaList.push({ type: 'image', url: compressedUrl });
                 }
 
-                // Proses link URL (jika diisi)
                 if(urlInput) {
                     let type = (urlInput.includes('.mp4') || urlInput.includes('video')) ? 'video' : 'image';
                     mediaList.push({ type: type, url: urlInput });
@@ -709,7 +714,7 @@
                 if(currentStatus === 'Sedang Dikirim') statusBadge = 'badge-shipping';
                 if(currentStatus === 'Selesai') statusBadge = 'badge-completed';
 
-                let itemsList = ord.items.map(i => `• ${i.name} (Rp ${i.price.toLocaleString('id-ID')})`).join("<br>");
+                let itemsList = ord.items.map(i => `• ${i.name} (Rp ${i.price.toLocaleString('id-ID')} x ${i.qty || 1})`).join("<br>");
                 let buyer = ord.buyer || { name: 'Customer', phone: '-', address: '-', payment: '-' };
                 
                 tbody.innerHTML += `
