@@ -121,13 +121,13 @@
     </div>
 
     <header>
-        <div class="logo" onclick="location.reload()">TOKO UCEN JAYA</div>
+        <div class="logo" onclick="resetAndReload()">TOKO UCEN JAYA</div>
         <div class="search-bar">
             <input type="text" id="search-input" placeholder="Cari nama barang..." oninput="searchProducts()">
             <button class="search-btn" onclick="searchProducts()">Cari</button>
         </div>
         <div class="header-right">
-            <button class="reset-btn" onclick="resetDataProduk()" title="Klik untuk memuat ulang data">🔄 Refresh</button>
+            <button class="reset-btn" onclick="refreshToko()" title="Segarkan tampilan produk">🔄 Refresh</button>
             <button class="cart-btn" onclick="openCartModal()">🛒 Bag (<span id="cart-count">0</span>)</button>
             <a href="admin.html" class="admin-profile-btn">🔐 Admin Panel</a>
         </div>
@@ -244,10 +244,17 @@
         function getCart() { return JSON.parse(localStorage.getItem('toko_cart')) || []; }
         function saveCart(c) { localStorage.setItem('toko_cart', JSON.stringify(c)); }
 
-        function resetDataProduk() {
-            localStorage.setItem('toko_products', JSON.stringify(DEFAULT_PRODUCTS));
+        // Tombol Refresh murni menyegarkan tampilan tanpa mereset/menggandakan produk
+        function refreshToko() {
             renderProducts();
-            alert("Data produk berhasil diperbarui & di-refresh!");
+            updateCartBadge();
+            alert("Toko berhasil di-refresh!");
+        }
+
+        // Fungsi khusus jika ingin mereset total database produk ke awal
+        function resetAndReload() {
+            renderProducts();
+            updateCartBadge();
         }
 
         let currentActiveProduct = null;
@@ -499,7 +506,6 @@
             let orders = JSON.parse(localStorage.getItem('toko_orders')) || [];
             let totalAmount = 0;
 
-            // Kurangi stok di produk pusat
             cart.forEach(item => {
                 let qty = item.qty || 1;
                 totalAmount += (item.price * qty);
