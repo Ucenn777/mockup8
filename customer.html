@@ -25,12 +25,12 @@
         .search-btn { background: #f97316; color: #fff; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; font-size: 11px; }
         .search-btn:hover { background: #ea580c; }
         
-        .cart-btn, .admin-profile-btn, .reset-btn { 
+        .cart-btn, .admin-profile-btn, .reset-btn, .logout-btn { 
             background: #fff; color: #ea580c; border: 1px solid #d1d5db; padding: 8px 14px; 
             border-radius: 30px; font-size: 12px; text-decoration: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; white-space: nowrap;
         }
-        .admin-profile-btn { background: #f97316; color: #fff; border-color: #f97316; }
-        .admin-profile-btn:hover { background: #ea580c; }
+        .logout-btn { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .logout-btn:hover { background: #dc2626; }
         .reset-btn { background: #f3f4f6; color: #4b5563; }
 
         .hero { background: #fff7ed; text-align: center; padding: 30px 20px; border-bottom: 1px solid #ffedd5; }
@@ -89,7 +89,6 @@
         .btn-primary { background: #f97316; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; width: 100%; }
         .btn-primary:hover { background: #ea580c; }
 
-        /* Modal Preview Layar Penuh */
         .preview-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .preview-content { position: relative; max-width: 600px; width: 100%; text-align: center; color: #fff; }
         .preview-display { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 6px; background: #000; }
@@ -129,7 +128,7 @@
         <div class="header-right">
             <button class="reset-btn" onclick="refreshToko()" title="Segarkan tampilan produk">🔄 Refresh</button>
             <button class="cart-btn" onclick="openCartModal()">🛒 Bag (<span id="cart-count">0</span>)</button>
-            <a href="admin.html" class="admin-profile-btn">🔐 Admin Panel</a>
+            <a href="index.html" class="logout-btn">🚪 Keluar</a>
         </div>
     </header>
 
@@ -251,7 +250,6 @@
             alert("Toko berhasil di-refresh!");
         }
 
-        // Fungsi khusus jika ingin mereset total database produk ke awal
         function resetAndReload() {
             renderProducts();
             updateCartBadge();
