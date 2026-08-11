@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - TOKO UCEN JAYA</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        body { 
+            display: flex; 
+            height: 100vh; 
+            background-color: #f3f4f6; 
+            overflow: hidden; 
+        }
+
+        /* Sidebar Desktop */
+        .sidebar { 
+            width: 260px; 
+            background: #1f2937; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding: 20px; 
+            transition: 0.3s;
+            z-index: 100;
+        }
+        .sidebar-top h2 { font-size: 15px; margin-bottom: 3px; color: #f97316; letter-spacing: 0.5px; }
+        .sidebar-top p { font-size: 11px; color: #9ca3af; margin-bottom: 25px; }
+        
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .nav-links li a { 
+            color: #d1d5db; text-decoration: none; font-size: 12px; padding: 10px 14px; 
+            border-radius: 6px; display: block; transition: 0.2s; font-weight: 500;
+        }
+        .nav-links li a:hover, .nav-links li a.active { background: #f97316; color: #fff; font-weight: bold; }
+
+        .sidebar-bottom a { 
+            color: #ef4444; text-decoration: none; font-size: 12px; padding: 10px 14px; 
+            border-radius: 6px; display: block; background: rgba(239, 68, 68, 0.1); text-align: center; font-weight: bold;
+        }
+        .sidebar-bottom a:hover { background: #ef4444; color: #fff; }
+
+        /* Tombol Hamburger Khusus HP */
+        .mobile-header {
+            display: none;
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 15px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hamburger-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto; 
+            padding: 25px; 
+        }
+        
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            background: #fff; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
+        }
+        .header-top h1 { font-size: 15px; color: #111; text-transform: uppercase; }
+
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-title { font-size: 13px; font-weight: bold; margin-bottom: 15px; color: #374151; text-transform: uppercase; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; }
+
+        /* Dashboard Metrics & Chart */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .metric-card { background: #fff; padding: 18px; border-radius: 8px; border-left: 4px solid #f97316; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .metric-title { font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; }
+        .metric-value { font-size: 20px; font-weight: bold; color: #111827; }
+
+        /* Tabel Responsive Container */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; min-width: 600px; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+        th { background: #f9fafb; font-weight: bold; color: #4b5563; text-transform: uppercase; font-size: 11px; }
+
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; display: inline-block; text-align: center; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-shipping { background: #e0f2fe; color: #0284c7; }
+        .badge-completed { background: #d1fae5; color: #059669; }
+
+        /* Aksi Susun ke Bawah */
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 120px;
+        }
+
+        .status-select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .status-select:focus { border-color: #f97316; }
+
+        .btn-action { 
+            width: 100%;
+            padding: 6px; 
+            border: none; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #fff; 
+            transition: 0.2s; 
+            text-align: center;
+        }
+        .btn-save-status { background: #10b981; }
+        .btn-save-status:hover { background: #059669; }
+        .btn-edit { background: #f59e0b; }
+        .btn-edit:hover { background: #d97706; }
+        .btn-del { background: #ef4444; }
+        .btn-del:hover { background: #dc2626; }
+
+        /* Filter Pesanan */
+        .filter-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-btn { padding: 6px 12px; border: 1px solid #d1d5db; background: #fff; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; color: #4b5563; }
+        .filter-btn.active { background: #f97316; color: #fff; border-color: #f97316; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #4b5563; text-transform: uppercase; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; outline: none; }
+        
+        .btn-primary { background: #f97316; color: #fff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .btn-primary:hover { background: #ea580c; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+        .modal-box { background: #fff; padding: 20px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+
+        /* Modal Preview Media Slider */
+        .preview-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .preview-content { position: relative; max-width: 600px; width: 100%; text-align: center; color: #fff; }
+        .preview-display { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 6px; background: #000; }
+        .preview-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .nav-btn { background: #f97316; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .nav-btn:hover { background: #ea580c; }
+        .close-preview { position: absolute; top: -40px; right: 0; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+        .clickable-thumb { cursor: pointer; transition: 0.2s; }
+        .clickable-thumb:hover { opacity: 0.8; transform: scale(1.05); }
+
+        /* MEDIA QUERIES UNTUK TAMPILAN HP (MOBILE) */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            .sidebar { 
+                position: fixed; 
+                left: -260px; 
+                top: 0; 
+                bottom: 0; 
+                height: 100%; 
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            }
+            .sidebar.mobile-show { left: 0; }
+            .mobile-header { display: flex; }
+            .main-content { padding: 15px; overflow: visible; }
+            .header-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-header">
+        <h2 style="font-size: 14px; color: #f97316;">TOKO UCEN JAYA</h2>
+        <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <h2>TOKO UCEN JAYA</h2>
+            <p>Admin Panel</p>
+            <ul class="nav-links">
+                <li><a href="#" onclick="switchTab('dashboard', event)" class="active" id="nav-dashboard">📊 Dashboard Grafik</a></li>
+                <li><a href="#" onclick="switchTab('products', event)" id="nav-products">📦 Kelola Barang & Stok</a></li>
+                <li><a href="#" onclick="switchTab('orders', event)" id="nav-orders">🛍️ Pesanan Masuk</a></li>
+                <li><a href="#" onclick="switchTab('add', event)" id="nav-add">➕ Tambah Produk Baru</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="index.html">🚪 Keluar (Logout)</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header-top">
+            <h1 id="page-title">Dashboard Grafik & Statistik</h1>
+            <a href="customer.html" target="_blank" style="font-size: 12px; color: #f97316; text-decoration: none; font-weight: bold;">🔗 Lihat Halaman Toko</a>
+        </div>
+
+        <div id="tab-dashboard" class="card">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Total Jenis Produk</div>
+                    <div class="metric-value" id="stat-total-prod">0</div>
+                </div>
+                <div class="metric-card" style="border-left-color: #10b981;">
+                    <div class="metric-title">Total Pendapatan Toko</div>
+                    <div class="metric-value" id="stat-total-rev">Rp 0</div>
+                </div>
+            </div>
+            <div class="card-title" style="margin-top: 20px;">Grafik Penjualan Mingguan</div>
+            <div style="position: relative; height: 250px; width: 100%;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-products" class="card" style="display: none;">
+            <div class="card-title">Daftar Stok & Edit Barang Toko (Multi Media)</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Media (Klik untuk Geser)</th>
+                            <th>Nama Barang</th>
+                            <th>Harga</th>
+                            <th>Stok</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-product-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-orders" class="card" style="display: none;">
+            <div class="card-title">Kelola Pesanan Pelanggan</div>
+            <div class="filter-container">
+                <button class="filter-btn active" onclick="filterOrders('All', this)">Semua</button>
+                <button class="filter-btn" onclick="filterOrders('Pending', this)">Pending</button>
+                <button class="filter-btn" onclick="filterOrders('Sedang Dikirim', this)">Sedang Dikirim</button>
+                <button class="filter-btn" onclick="filterOrders('Selesai', this)">Selesai</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID / Waktu</th>
+                            <th>Pembeli & Kontak</th>
+                            <th>Barang Dibeli</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Aksi / Kelola Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-orders-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-add" class="card" style="display: none; max-width: 500px;">
+            <div class="card-title">Tambah Produk Baru (Bisa Banyak Foto / Video Sekaligus)</div>
+            <form onsubmit="addNewProduct(event)">
+                <div class="form-group">
+                    <label>Nama Produk</label>
+                    <input type="text" id="new-name" required placeholder="Contoh: Tas Laptop">
+                </div>
+                <div class="form-group">
+                    <label>Harga (Rp)</label>
+                    <input type="number" id="new-price" required placeholder="Contoh: 150000">
+                </div>
+                <div class="form-group">
+                    <label>Stok Awal</label>
+                    <input type="number" id="new-stock" required placeholder="Contoh: 10">
+                </div>
+                <div class="form-group">
+                    <label>Pilih Banyak File (Foto / Video)</label>
+                    <input type="file" id="new-files" accept="image/*,video/*" multiple required style="padding: 6px; cursor: pointer;">
+                    <small style="color: #6b7280; font-size: 10px; display: block; margin-top: 3px;">Tahan tombol Ctrl/Shift untuk memilih banyak file sekaligus.</small>
+                </div>
+                <button type="submit" class="btn-primary">Simpan Produk Baru</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-box">
+            <div class="card-title">Edit Detail Produk</div>
+            <form onsubmit="saveEditedProduct(event)">
+                <input type="hidden" id="edit-idx">
+                <div class="form-group">
+                    <label>Nama Produk</label>
+                    <input type="text" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Harga (Rp)</label>
+                    <input type="number" id="edit-price" required>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Stok</label>
+                    <input type="number" id="edit-stock" required>
+                </div>
+                <div class="form-group">
+                    <label>Tambah/Ganti File Media Baru (Opsional)</label>
+                    <input type="file" id="edit-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                    <button type="submit" class="btn-primary" style="flex:1;">Simpan</button>
+                    <button type="button" onclick="closeModal()" class="btn-primary" style="flex:1; background:#6b7280;">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <button class="close-preview" onclick="closePreviewModal()">&times;</button>
+            <div id="preview-container"></div>
+            <div class="preview-nav">
+                <button class="nav-btn" onclick="prevMedia()">◀ Sebelumnya</button>
+                <span id="preview-indicator" style="font-size: 12px; font-weight: bold;">1 / 1</span>
+                <button class="nav-btn" onclick="nextMedia()">Selanjutnya ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FALLBACK_IMG = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80";
+        let salesChart = null;
+        let currentMediaList = [];
+        let currentMediaIndex = 0;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-show');
+        }
+
+        function getProducts() { return JSON.parse(localStorage.getItem('toko_products')) || []; }
+        function saveProducts(p) { localStorage.setItem('toko_products', JSON.stringify(p)); }
+
+        function getOrders() { return JSON.parse(localStorage.getItem('toko_orders')) || []; }
+        function saveOrders(o) { localStorage.setItem('toko_orders', JSON.stringify(o)); }
+
+        window.onload = function() {
+            renderDashboardStats();
+            renderAdminProducts();
+            renderAdminOrders();
+            initChart();
+        };
+
+        function switchTab(tab, event) {
+            document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            
+            if(tab === 'dashboard') {
+                document.getElementById('tab-dashboard').style.display = 'block';
+                document.getElementById('page-title').innerText = 'Dashboard Grafik & Statistik';
+                renderDashboardStats();
+                if(salesChart) salesChart.update();
+            } else if(tab === 'products') {
+                document.getElementById('tab-products').style.display = 'block';
+                document.getElementById('page-title').innerText = 'Kelola Barang & Stok';
+                renderAdminProducts();
+            } else if(tab === 'orders') {
+                document.getElementById('tab-orders').style.display = 'block';
+                document.getElementById('page-title').innerText = 'Kelola Pesanan Pelanggan';
+                renderAdminOrders();
+            } else if(tab === 'add') {
+                document.getElementById('tab-add').style.display = 'block';
+                document.getElementById('page-title').innerText = 'Tambah Produk Baru';
+            }
+            if(event) event.target.classList.add('active');
+
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('mobile-show');
+            }
+        }
+
+        function renderDashboardStats() {
+            let products = getProducts();
+            let orders = getOrders();
+            document.getElementById('stat-total-prod').innerText = products.length;
+            let totalRev = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+            document.getElementById('stat-total-rev').innerText = "Rp " + totalRev.toLocaleString('id-ID');
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                    datasets: [{
+                        label: 'Penjualan (Rp)',
+                        data: [1200000, 1900000, 1500000, 2800000, 3200000, 4100000, 3900000],
+                        backgroundColor: '#f97316',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderAdminProducts() {
+            let products = getProducts();
+            let tbody = document.getElementById("admin-product-table");
+            tbody.innerHTML = "";
+            if(products.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:#6b7280;'>Belum ada produk.</td></tr>";
+                return;
+            }
+            products.forEach((p, idx) => {
+                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: p.media || FALLBACK_IMG }];
+                let firstMedia = mediaList[0];
+                let mediaElement = "";
+
+                if(firstMedia.type === 'video') {
+                    mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px; background:#000;"></video>`;
+                } else {
+                    mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
+                }
+
+                let encodedMedia = encodeURIComponent(JSON.stringify(mediaList));
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div class="clickable-thumb" onclick="openPreviewModal('${encodedMedia}')" title="Klik untuk lihat foto/video">
+                                ${mediaElement}
+                                <br><span style="font-size:9px; color:#f97316; font-weight:bold;">🔍 ${mediaList.length} File (Klik)</span>
+                            </div>
+                        </td>
+                        <td><b>${p.name}</b></td>
+                        <td>Rp ${p.price.toLocaleString('id-ID')}</td>
+                        <td><b>${p.stock} pcs</b></td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="openEditModal(${idx})" style="margin-bottom:4px;">Edit</button>
+                            <button class="btn-action btn-del" onclick="deleteProduct(${idx})">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openPreviewModal(encodedMedia) {
+            currentMediaList = JSON.parse(decodeURIComponent(encodedMedia));
+            currentMediaIndex = 0;
+            document.getElementById('previewModal').style.display = 'flex';
+            displayCurrentMedia();
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function displayCurrentMedia() {
+            let container = document.getElementById('preview-container');
+            let indicator = document.getElementById('preview-indicator');
+            let item = currentMediaList[currentMediaIndex];
+
+            if(item.type === 'video') {
+                container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
+            } else {
+                container.innerHTML = `<img src="${item.url}" class="preview-display">`;
+            }
+            indicator.innerText = `${currentMediaIndex + 1} / ${currentMediaList.length}`;
+        }
+
+        function nextMedia() {
+            if(currentMediaList.length > 1) {
+                currentMediaIndex = (currentMediaIndex + 1) % currentMediaList.length;
+                displayCurrentMedia();
+            }
+        }
+
+        function prevMedia() {
+            if(currentMediaList.length > 1) {
+                currentMediaIndex = (currentMediaIndex - 1 + currentMediaList.length) % currentMediaList.length;
+                displayCurrentMedia();
+            }
+        }
+
+        function openEditModal(idx) {
+            let products = getProducts();
+            let p = products[idx];
+            document.getElementById("edit-idx").value = idx;
+            document.getElementById("edit-name").value = p.name;
+            document.getElementById("edit-price").value = p.price;
+            document.getElementById("edit-stock").value = p.stock;
+            document.getElementById("edit-files").value = "";
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
+        function saveEditedProduct(event) {
+            event.preventDefault();
+            let idx = document.getElementById("edit-idx").value;
+            let products = getProducts();
+            let filesInput = document.getElementById("edit-files");
+
+            products[idx].name = document.getElementById("edit-name").value;
+            products[idx].price = parseInt(document.getElementById("edit-price").value);
+            products[idx].stock = parseInt(document.getElementById("edit-stock").value);
+
+            if(filesInput.files && filesInput.files.length > 0) {
+                let files = Array.from(filesInput.files);
+                let processedFiles = 0;
+                let newMediaList = [];
+
+                files.forEach((file) => {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        newMediaList.push({
+                            type: file.type.startsWith('video') ? 'video' : 'image',
+                            url: e.target.result
+                        });
+                        processedFiles++;
+
+                        if(processedFiles === files.length) {
+                            try {
+                                products[idx].mediaList = newMediaList;
+                                products[idx].media = newMediaList[0].url;
+                                saveProducts(products);
+                                closeModal();
+                                renderAdminProducts();
+                                alert("Produk dan media berhasil diperbarui!");
+                            } catch (err) {
+                                alert("Gagal menyimpan perubahan file.");
+                            }
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                try {
+                    saveProducts(products);
+                    closeModal();
+                    renderAdminProducts();
+                    alert("Produk berhasil diperbarui!");
+                } catch (err) {
+                    alert("Gagal menyimpan perubahan.");
+                }
+            }
+        }
+
+        function deleteProduct(idx) {
+            if(confirm("Yakin ingin menghapus produk ini?")) {
+                let products = getProducts();
+                products.splice(idx, 1);
+                saveProducts(products);
+                renderAdminProducts();
+                renderDashboardStats();
+            }
+        }
+
+        function addNewProduct(event) {
+            event.preventDefault();
+            let name = document.getElementById("new-name").value;
+            let price = parseInt(document.getElementById("new-price").value);
+            let stock = parseInt(document.getElementById("new-stock").value);
+            let filesInput = document.getElementById("new-files");
+
+            let files = Array.from(filesInput.files);
+            if(files.length === 0) {
+                alert("Silakan pilih minimal 1 file foto atau video!");
+                return;
+            }
+
+            let mediaList = [];
+            let processedCount = 0;
+
+            files.forEach((file) => {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    mediaList.push({
+                        type: file.type.startsWith('video') ? 'video' : 'image',
+                        url: e.target.result
+                    });
+                    processedCount++;
+
+                    if(processedCount === files.length) {
+                        try {
+                            let products = getProducts();
+                            products.push({ 
+                                id: Date.now(), 
+                                name, 
+                                price, 
+                                stock, 
+                                mediaList: mediaList,
+                                media: mediaList[0].url
+                            });
+                            
+                            saveProducts(products);
+                            alert(`Produk baru beserta ${mediaList.length} file media berhasil disimpan secara permanen!`);
+                            event.target.reset();
+                            switchTab('products');
+                        } catch (error) {
+                            alert("Gagal menyimpan ke penyimpanan lokal browser.");
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        let currentFilterStatus = 'All';
+        function filterOrders(status, btnElement) {
+            currentFilterStatus = status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderAdminOrders();
+        }
+
+        function renderAdminOrders() {
+            let orders = getOrders();
+            let tbody = document.getElementById("admin-orders-table");
+            tbody.innerHTML = "";
+
+            let filtered = orders;
+            if(currentFilterStatus !== 'All') {
+                filtered = orders.filter(o => (o.status || 'Pending') === currentFilterStatus);
+            }
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#6b7280; padding:20px;'>Belum ada data pesanan.</td></tr>";
+                return;
+            }
+
+            filtered.forEach((ord) => {
+                let statusBadge = 'badge-pending';
+                let currentStatus = ord.status || 'Pending';
+                if(currentStatus === 'Sedang Dikirim') statusBadge = 'badge-shipping';
+                if(currentStatus === 'Selesai') statusBadge = 'badge-completed';
+
+                let itemsList = ord.items.map(i => `• ${i.name} (Rp ${i.price.toLocaleString('id-ID')})`).join("<br>");
+                let buyer = ord.buyer || { name: 'Customer', phone: '-', address: '-', payment: '-' };
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${ord.orderId}</b><br><span style="font-size:10px; color:#6b7280;">${ord.date}</span></td>
+                        <td><b>${buyer.name}</b> (${buyer.phone})<br><span style="font-size:11px; color:#555;">${buyer.address}</span><br><span style="font-size:10px; color:#0284c7;">Metode: ${buyer.payment}</span></td>
+                        <td>${itemsList}</td>
+                        <td><b>Rp ${ord.total.toLocaleString('id-ID')}</b></td>
+                        <td><span class="badge ${statusBadge}">${currentStatus}</span></td>
+                        <td>
+                            <div class="action-container">
+                                <select id="status-select-${ord.orderId}" class="status-select">
+                                    <option value="Pending" ${currentStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Sedang Dikirim" ${currentStatus === 'Sedang Dikirim' ? 'selected' : ''}>Sedang Dikirim</option>
+                                    <option value="Selesai" ${currentStatus === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                                </select>
+                                <button class="btn-action btn-save-status" onclick="updateOrderStatus('${ord.orderId}')">Simpan</button>
+                                <button class="btn-action btn-del" onclick="deleteOrder('${ord.orderId}')">Hapus ngab</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateOrderStatus(orderId) {
+            let selectElement = document.getElementById(`status-select-${orderId}`);
+            let newStatus = selectElement.value;
+            
+            let orders = getOrders();
+            let ord = orders.find(o => o.orderId === orderId);
+            if(ord) {
+                ord.status = newStatus;
+                saveOrders(orders);
+                renderAdminOrders();
+                alert(`Status pesanan ${orderId} berhasil diubah menjadi: ${newStatus}`);
+            }
+        }
+
+        function deleteOrder(orderId) {
+            if(confirm("Yakin ingin menghapus riwayat pesanan ini?")) {
+                let orders = getOrders();
+                orders = orders.filter(o => o.orderId !== orderId);
+                saveOrders(orders);
+                renderAdminOrders();
+                renderDashboardStats();
+            }
+        }
+    </script>
+</body>
+</html>
