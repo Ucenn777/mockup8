@@ -294,9 +294,9 @@
                     <input type="number" id="new-stock" required placeholder="Contoh: 10">
                 </div>
                 <div class="form-group">
-                    <label>Pilih File Foto dari Galeri (Opsional)</label>
-                    <input type="file" id="new-files" accept="image/*" multiple style="padding: 6px; cursor: pointer;">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Foto akan otomatis dikompres agar memori browser aman.</small>
+                    <label>Pilih Foto atau Video dari Galeri (Tanpa Batas Ukuran)</label>
+                    <input type="file" id="new-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa pilih foto atau video berukuran besar langsung dari galeri HP.</small>
                 </div>
                 <div class="form-group">
                     <label>Atau Masukkan Link URL Foto / Video (Opsional)</label>
@@ -326,8 +326,8 @@
                     <input type="number" id="edit-stock" required>
                 </div>
                 <div class="form-group">
-                    <label>Ganti File Foto Baru (Opsional)</label>
-                    <input type="file" id="edit-files" accept="image/*" multiple style="padding: 6px; cursor: pointer;">
+                    <label>Ganti File Foto/Video Baru (Tanpa Batas Ukuran)</label>
+                    <input type="file" id="edit-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
                 </div>
                 <div class="form-group">
                     <label>Atau Ganti Link URL Baru (Opsional)</label>
@@ -387,7 +387,7 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                alert("Gagal menyimpan! Kapasitas penyimpanan memori browser penuh. Hapus produk lama terlebih dahulu atau gunakan link URL.");
+                alert("Gagal menyimpan ke penyimpanan memori browser. Hapus produk lama terlebih dahulu.");
                 return false;
             }
         }
@@ -473,7 +473,7 @@
                 let firstMedia = mediaList[0];
                 let mediaElement = "";
 
-                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video')));
+                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video') || firstMedia.url.startsWith('blob:')));
                 if(isVideo) {
                     mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;"></video>`;
                 } else {
@@ -518,7 +518,7 @@
             let indicator = document.getElementById('preview-indicator');
             let item = currentMediaList[currentMediaIndex];
 
-            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video')));
+            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video') || item.url.startsWith('blob:')));
             if(isVideo) {
                 container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
             } else {
@@ -557,28 +557,10 @@
             document.getElementById("editModal").style.display = "none";
         }
 
-        function compressImage(file, maxWidth = 500, quality = 0.5) {
+        async function readFileAsObjectUrl(file) {
             return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function (event) {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = function () {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                };
+                let fileUrl = URL.createObjectURL(file);
+                resolve(fileUrl);
             });
         }
 
@@ -598,8 +580,9 @@
             if(filesInput.files && filesInput.files.length > 0) {
                 let files = Array.from(filesInput.files);
                 for(let file of files) {
-                    let compressedUrl = await compressImage(file);
-                    newMediaList.push({ type: 'image', url: compressedUrl });
+                    let fileUrl = await readFileAsObjectUrl(file);
+                    let type = file.type.startsWith('video') ? 'video' : 'image';
+                    newMediaList.push({ type: type, url: fileUrl });
                 }
             }
 
@@ -640,7 +623,7 @@
 
             let files = Array.from(filesInput.files);
             if(files.length === 0 && !urlInput) {
-                alert("Silakan pilih minimal foto dari galeri atau masukkan link URL!");
+                alert("Silakan pilih minimal file dari galeri atau masukkan link URL!");
                 return;
             }
 
@@ -652,8 +635,9 @@
                 let mediaList = [];
                 
                 for(let file of files) {
-                    let compressedUrl = await compressImage(file);
-                    mediaList.push({ type: 'image', url: compressedUrl });
+                    let fileUrl = await readFileAsObjectUrl(file);
+                    let type = file.type.startsWith('video') ? 'video' : 'image';
+                    mediaList.push({ type: type, url: fileUrl });
                 }
 
                 if(urlInput) {
@@ -672,7 +656,7 @@
                 });
                 
                 if(saveProducts(products)) {
-                    alert(`Produk baru berhasil ditambahkan!`);
+                    alert(`Produk baru berhasil ditambahkan tanpa batasan ukuran!`);
                     event.target.reset();
                     switchTab('products');
                 }
