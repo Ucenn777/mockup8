@@ -62,6 +62,7 @@
         }
         .direct-buy-btn { background: #f97316; color: #fff; }
         .direct-buy-btn:hover { background: #ea580c; }
+        .buy-btn:disabled, .direct-buy-btn:disabled { background: #9ca3af; border-color: #9ca3af; color: #fff; cursor: not-allowed; }
 
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); 
@@ -128,7 +129,7 @@
         <div class="header-right">
             <button class="reset-btn" onclick="resetDataProduk()" title="Klik untuk memuat ulang data">🔄 Refresh</button>
             <button class="cart-btn" onclick="openCartModal()">🛒 Bag (<span id="cart-count">0</span>)</button>
-            <a href="index.html" class="admin-profile-btn" style="background:#ef4444; border-color:#ef4444;">🚪 Keluar</a>
+            <a href="admin.html" class="admin-profile-btn">🔐 Admin Panel</a>
         </div>
     </header>
 
@@ -158,7 +159,7 @@
                     <h3 id="detail-name" style="font-size: 16px; margin-bottom: 6px;"></h3>
                     <div id="detail-price" style="font-size: 15px; font-weight: bold; color: #ea580c; margin-bottom: 8px;"></div>
                     <div id="detail-stock" style="font-size: 11px; color: #6b7280; margin-bottom: 15px;"></div>
-                    <button class="btn-primary" onclick="addCurrentProductToCart()">+ Tambahkan ke Tas</button>
+                    <button class="btn-primary" id="detail-add-btn" onclick="addCurrentProductToCart()">+ Tambahkan ke Tas</button>
                 </div>
             </div>
         </div>
@@ -221,8 +222,7 @@
         const FALLBACK_IMG = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80";
 
         const DEFAULT_PRODUCTS = [
-            { id: 1, name: "Mouse Gaming RGB", price: 150000, stock: 15, mediaList: [{ type: "image", url: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }], media: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" },
-            { id: 2, name: "Keyboard Mechanical RGB", price: 289000, stock: 10, mediaList: [{ type: "image", url: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80" }], media: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80" }
+            { id: 1, name: "Mouse Gaming RGB", price: 150000, stock: 15, mediaList: [{ type: "image", url: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }], media: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }
         ];
 
         function getProducts() { 
@@ -231,7 +231,13 @@
                 localStorage.setItem('toko_products', JSON.stringify(DEFAULT_PRODUCTS));
                 return DEFAULT_PRODUCTS;
             }
-            return JSON.parse(stored); 
+            try {
+                let parsed = JSON.parse(stored);
+                if(!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PRODUCTS;
+                return parsed;
+            } catch(e) {
+                return DEFAULT_PRODUCTS;
+            }
         }
 
         function saveProducts(p) { localStorage.setItem('toko_products', JSON.stringify(p)); }
@@ -262,17 +268,19 @@
                 return;
             }
             products.forEach(p => {
-                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: p.media || p.img || FALLBACK_IMG }];
+                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: p.media || FALLBACK_IMG }];
                 let firstMedia = mediaList[0];
                 let mediaHtml = "";
                 
-                if (firstMedia.type === 'video') {
+                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video')));
+                if (isVideo) {
                     mediaHtml = `<video src="${firstMedia.url}" class="product-video" muted></video>`;
                 } else {
                     mediaHtml = `<img src="${firstMedia.url}" class="product-img" onerror="this.src='${FALLBACK_IMG}'">`;
                 }
 
                 let encodedMedia = encodeURIComponent(JSON.stringify(mediaList));
+                let isHabis = p.stock <= 0;
 
                 grid.innerHTML += `
                     <div class="product-card" onclick="openProductDetail(${p.id})">
@@ -286,7 +294,7 @@
                             <div class="product-stock">Stok: ${p.stock} pcs</div>
                         </div>
                         <div class="card-actions">
-                            <button class="buy-btn" onclick="event.stopPropagation(); quickAdd(${p.id})">+ Bag</button>
+                            <button class="buy-btn" onclick="event.stopPropagation(); quickAdd(${p.id})" ${isHabis ? 'disabled' : ''}>${isHabis ? 'Habis' : '+ Bag'}</button>
                             <button class="direct-buy-btn" onclick="event.stopPropagation(); openProductDetail(${p.id})">Beli</button>
                         </div>
                     </div>
@@ -297,7 +305,6 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Fungsi Detail Produk & Slider di dalam Modal Detail
         function openProductDetail(id) {
             currentActiveProduct = getProducts().find(p => p.id === id);
             if (!currentActiveProduct) return;
@@ -313,6 +320,17 @@
             document.getElementById("detail-price").innerText = "Rp " + currentActiveProduct.price.toLocaleString('id-ID');
             document.getElementById("detail-stock").innerText = "Stok Tersedia: " + currentActiveProduct.stock + " pcs";
             
+            let addBtn = document.getElementById("detail-add-btn");
+            if(currentActiveProduct.stock <= 0) {
+                addBtn.innerText = "Stok Habis";
+                addBtn.disabled = true;
+                addBtn.style.background = "#9ca3af";
+            } else {
+                addBtn.innerText = "+ Tambahkan ke Tas";
+                addBtn.disabled = false;
+                addBtn.style.background = "#f97316";
+            }
+
             openModal('product-detail-modal');
         }
 
@@ -322,7 +340,8 @@
             const indicator = document.getElementById("detail-media-indicator");
             let item = detailMediaList[detailMediaIdx];
 
-            if (item.type === 'video') {
+            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video')));
+            if (isVideo) {
                 container.innerHTML = `<video src="${item.url}" class="detail-video" controls autoplay></video>`;
             } else {
                 container.innerHTML = `<img src="${item.url}" class="detail-img" onerror="this.src='${FALLBACK_IMG}'">`;
@@ -350,7 +369,6 @@
             }
         }
 
-        // Fungsi Modal Preview Layar Penuh (Fullscreen Zoom & Slider)
         function openPreviewModal(encodedMedia) {
             previewMediaList = JSON.parse(decodeURIComponent(encodedMedia));
             previewMediaIdx = 0;
@@ -367,10 +385,11 @@
             let indicator = document.getElementById('preview-indicator');
             let item = previewMediaList[previewMediaIdx];
 
-            if (item.type === 'video') {
+            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video')));
+            if (isVideo) {
                 container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
             } else {
-                container.innerHTML = `<img src="${item.url}" class="preview-display">`;
+                container.innerHTML = `<img src="${item.url}" class="preview-display" onerror="this.src='${FALLBACK_IMG}'">`;
             }
             indicator.innerText = `${previewMediaIdx + 1} / ${previewMediaList.length}`;
         }
@@ -400,7 +419,18 @@
                 let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: p.media || FALLBACK_IMG }];
                 let mediaSrc = mediaList[0].url;
                 
-                cart.push({ id: p.id, name: p.name, price: p.price, img: mediaSrc });
+                let existing = cart.find(item => item.id === p.id);
+                if(existing) {
+                    if(existing.qty < p.stock) {
+                        existing.qty++;
+                    } else {
+                        alert("Jumlah di keranjang sudah mencapai batas stok!");
+                        return;
+                    }
+                } else {
+                    cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, img: mediaSrc });
+                }
+
                 saveCart(cart);
                 updateCartBadge();
                 alert(`✨ ${p.name} ditambahkan ke tas!`);
@@ -415,7 +445,9 @@
         }
 
         function updateCartBadge() {
-            document.getElementById("cart-count").innerText = getCart().length;
+            let cart = getCart();
+            let totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+            document.getElementById("cart-count").innerText = totalQty;
         }
 
         function openCartModal() {
@@ -427,11 +459,13 @@
                 container.innerHTML = "<p style='text-align:center; color:#6b7280; padding:10px;'>Tas belanja kosong.</p>";
             } else {
                 cart.forEach((item, idx) => {
-                    total += item.price;
+                    let qty = item.qty || 1;
+                    let subtotal = item.price * qty;
+                    total += subtotal;
                     container.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:11px;">
-                            <div><b>${item.name}</b> - <span style="color:#ea580c;">Rp ${item.price.toLocaleString('id-ID')}</span></div>
-                            <button onclick="removeFromCart(${idx})" style="background:#ef4444; color:#fff; border:none; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;">Hapus</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:11px; border-bottom:1px solid #f3f4f6; padding-bottom:5px;">
+                            <div><b>${item.name}</b><br>Rp ${item.price.toLocaleString('id-ID')} x ${qty} = <span style="color:#ea580c; font-weight:bold;">Rp ${subtotal.toLocaleString('id-ID')}</span></div>
+                            <button onclick="removeFromCart(${idx})" style="background:#ef4444; color:#fff; border:none; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;">Hapus</button>
                         </div>
                     `;
                 });
@@ -465,11 +499,14 @@
             let orders = JSON.parse(localStorage.getItem('toko_orders')) || [];
             let totalAmount = 0;
 
+            // Kurangi stok di produk pusat
             cart.forEach(item => {
-                totalAmount += item.price;
+                let qty = item.qty || 1;
+                totalAmount += (item.price * qty);
                 let prod = products.find(p => p.id === item.id);
-                if (prod && prod.stock > 0) {
-                    prod.stock -= 1;
+                if (prod) {
+                    prod.stock -= qty;
+                    if(prod.stock < 0) prod.stock = 0;
                 }
             });
 
