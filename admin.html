@@ -294,9 +294,9 @@
                     <input type="number" id="new-stock" required placeholder="Contoh: 10">
                 </div>
                 <div class="form-group">
-                    <label>Pilih Foto atau Video dari Galeri</label>
+                    <label>Pilih Foto atau Video dari Galeri (Tanpa Batas Ukuran)</label>
                     <input type="file" id="new-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa pilih beberapa foto atau video dari galeri HP.</small>
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa pilih foto atau video berukuran besar langsung dari galeri HP.</small>
                 </div>
                 <div class="form-group">
                     <label>Atau Masukkan Link URL Foto / Video (Opsional)</label>
@@ -387,7 +387,7 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                alert("Gagal menyimpan ke penyimpanan memori browser. Ukuran file terlalu besar, kurangi jumlah atau ukuran foto/video.");
+                alert("Gagal menyimpan ke penyimpanan memori browser. Kurangi ukuran atau jumlah file galeri.");
                 return false;
             }
         }
@@ -569,13 +569,11 @@
 
         async function processFile(file) {
             return new Promise((resolve) => {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    let fileType = file.type.toLowerCase();
-                    let isVideo = fileType.includes('video') || file.name.toLowerCase().endsWith('.mp4');
-                    resolve({ type: isVideo ? 'video' : 'image', url: e.target.result });
-                };
-                reader.readAsDataURL(file);
+                let fileUrl = URL.createObjectURL(file);
+                let fileType = file.type.toLowerCase();
+                let fileName = file.name.toLowerCase();
+                let isVideo = fileType.includes('video') || fileName.endsWith('.mp4') || fileName.endsWith('.mkv') || fileName.endsWith('.webm');
+                resolve({ type: isVideo ? 'video' : 'image', url: fileUrl });
             });
         }
 
@@ -672,7 +670,7 @@
                 });
                 
                 if(saveProducts(products)) {
-                    alert(`Produk baru berhasil ditambahkan!`);
+                    alert(`Produk baru berhasil ditambahkan tanpa batasan ukuran!`);
                     event.target.reset();
                     switchTab('products');
                 }
