@@ -294,14 +294,13 @@
                     <input type="number" id="new-stock" required placeholder="Contoh: 10">
                 </div>
                 <div class="form-group">
-                    <label>Pilih Foto atau Video dari Galeri (Tanpa Batas Ukuran)</label>
+                    <label>Pilih Foto atau Video dari Galeri</label>
                     <input type="file" id="new-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa pilih foto atau video berukuran besar langsung dari galeri HP.</small>
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa pilih beberapa foto atau video dari galeri HP.</small>
                 </div>
                 <div class="form-group">
                     <label>Atau Masukkan Link URL Foto / Video (Opsional)</label>
                     <input type="text" id="new-url" placeholder="https://contoh.com/gambar.jpg atau .mp4">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa masukkan link gambar atau link video online (misal MP4).</small>
                 </div>
                 <button type="submit" class="btn-primary" id="btn-submit-prod">Simpan Produk Baru</button>
             </form>
@@ -312,7 +311,7 @@
         <div class="modal-box">
             <div class="card-title">Edit Detail Produk</div>
             <form onsubmit="saveEditedProduct(event)">
-                <input type="hidden" id="edit-idx">
+                <input type="hidden" id="edit-id">
                 <div class="form-group">
                     <label>Nama Produk</label>
                     <input type="text" id="edit-name" required>
@@ -328,7 +327,7 @@
                 <div class="form-group">
                     <label>Ganti File Foto/Video Baru (Opsional)</label>
                     <input type="file" id="edit-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Kosongkan jika tidak ingin mengganti foto/video.</small>
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Kosongkan jika tidak ingin mengganti file.</small>
                 </div>
                 <div class="form-group">
                     <label>Atau Ganti Link URL Baru (Opsional)</label>
@@ -388,7 +387,7 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                alert("Gagal menyimpan ke penyimpanan memori browser. Hapus produk lama terlebih dahulu.");
+                alert("Gagal menyimpan ke penyimpanan memori browser. Ukuran file terlalu besar, kurangi jumlah atau ukuran foto/video.");
                 return false;
             }
         }
@@ -469,7 +468,7 @@
                 tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:#6b7280;'>Belum ada produk.</td></tr>";
                 return;
             }
-            products.forEach((p, idx) => {
+            products.forEach((p) => {
                 let mediaList = [];
                 if(p.mediaList && Array.isArray(p.mediaList) && p.mediaList.length > 0) {
                     mediaList = p.mediaList;
@@ -483,8 +482,8 @@
                 let firstMedia = mediaList[0];
                 let mediaElement = "";
 
-                if(firstMedia.type === 'video') {
-                    mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;"></video>`;
+                if(firstMedia.type === 'video' || (firstMedia.url && firstMedia.url.includes('video'))) {
+                    mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" muted></video>`;
                 } else {
                     mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
                 }
@@ -496,15 +495,15 @@
                         <td>
                             <div class="clickable-thumb" onclick="openPreviewModal('${encodedMedia}')" title="Klik untuk lihat media">
                                 ${mediaElement}
-                                <br><span style="font-size:9px; color:#f97316; font-weight:bold;">🔍 ${mediaList.length} File (Klik)</span>
+                                <br><span style="font-size:9px; color:#f97316; font-weight:bold;">🔍 ${mediaList.length} File</span>
                             </div>
                         </td>
                         <td><b>${p.name}</b></td>
                         <td>Rp ${p.price.toLocaleString('id-ID')}</td>
                         <td><b>${p.stock} pcs</b></td>
                         <td>
-                            <button class="btn-action btn-edit" onclick="openEditModal(${idx})" style="margin-bottom:4px;">Edit</button>
-                            <button class="btn-action btn-del" onclick="deleteProduct(${idx})">Hapus</button>
+                            <button class="btn-action btn-edit" onclick="openEditModal(${p.id})" style="margin-bottom:4px;">Edit</button>
+                            <button class="btn-action btn-del" onclick="deleteProduct(${p.id})">Hapus</button>
                         </td>
                     </tr>
                 `;
@@ -527,7 +526,8 @@
             let indicator = document.getElementById('preview-indicator');
             let item = currentMediaList[currentMediaIndex];
 
-            if(item.type === 'video') {
+            let isVideo = item.type === 'video' || (item.url && item.url.includes('video'));
+            if(isVideo) {
                 container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
             } else {
                 container.innerHTML = `<img src="${item.url}" class="preview-display" onerror="this.src='${FALLBACK_IMG}'">`;
@@ -549,10 +549,12 @@
             }
         }
 
-        function openEditModal(idx) {
+        function openEditModal(id) {
             let products = getProducts();
-            let p = products[idx];
-            document.getElementById("edit-idx").value = idx;
+            let p = products.find(item => item.id === id);
+            if(!p) return;
+
+            document.getElementById("edit-id").value = p.id;
             document.getElementById("edit-name").value = p.name;
             document.getElementById("edit-price").value = p.price;
             document.getElementById("edit-stock").value = p.stock;
@@ -567,33 +569,29 @@
 
         async function processFile(file) {
             return new Promise((resolve) => {
-                let fileUrl = URL.createObjectURL(file);
-                let fileName = file.name.toLowerCase();
-                let fileType = file.type.toLowerCase();
-
-                let isVideo = fileType.includes('video') || 
-                              fileName.endsWith('.mp4') || 
-                              fileName.endsWith('.mkv') || 
-                              fileName.endsWith('.webm') || 
-                              fileName.endsWith('.avi') || 
-                              fileName.endsWith('.mov') || 
-                              fileName.endsWith('.3gp');
-
-                let type = isVideo ? 'video' : 'image';
-                resolve({ type: type, url: fileUrl });
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let fileType = file.type.toLowerCase();
+                    let isVideo = fileType.includes('video') || file.name.toLowerCase().endsWith('.mp4');
+                    resolve({ type: isVideo ? 'video' : 'image', url: e.target.result });
+                };
+                reader.readAsDataURL(file);
             });
         }
 
         async function saveEditedProduct(event) {
             event.preventDefault();
-            let idx = document.getElementById("edit-idx").value;
+            let id = parseInt(document.getElementById("edit-id").value);
             let products = getProducts();
+            let p = products.find(item => item.id === id);
+            if(!p) return;
+
             let filesInput = document.getElementById("edit-files");
             let urlInput = document.getElementById("edit-url").value.trim();
 
-            products[idx].name = document.getElementById("edit-name").value;
-            products[idx].price = parseInt(document.getElementById("edit-price").value);
-            products[idx].stock = parseInt(document.getElementById("edit-stock").value);
+            p.name = document.getElementById("edit-name").value;
+            p.price = parseInt(document.getElementById("edit-price").value);
+            p.stock = parseInt(document.getElementById("edit-stock").value);
 
             let newMediaList = [];
 
@@ -606,15 +604,13 @@
             }
 
             if(urlInput) {
-                let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('.webm') || urlInput.includes('.mov') || urlInput.includes('video');
-                let type = isUrlVideo ? 'video' : 'image';
-                newMediaList.push({ type: type, url: urlInput });
+                let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('video');
+                newMediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
             }
 
-            // Hanya perbarui media jika user memasukkan file atau URL baru. Jika kosong, pertahankan media lama.
             if(newMediaList.length > 0) {
-                products[idx].mediaList = newMediaList;
-                products[idx].media = newMediaList[0].url;
+                p.mediaList = newMediaList;
+                p.media = newMediaList[0].url;
             }
 
             if(saveProducts(products)) {
@@ -624,10 +620,10 @@
             }
         }
 
-        function deleteProduct(idx) {
+        function deleteProduct(id) {
             if(confirm("Yakin ingin menghapus produk ini?")) {
                 let products = getProducts();
-                products.splice(idx, 1);
+                products = products.filter(p => p.id !== id);
                 saveProducts(products);
                 renderAdminProducts();
                 renderDashboardStats();
@@ -661,13 +657,12 @@
                 }
 
                 if(urlInput) {
-                    let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('.webm') || urlInput.includes('.mov') || urlInput.includes('video');
-                    let type = isUrlVideo ? 'video' : 'image';
-                    mediaList.push({ type: type, url: urlInput });
+                    let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('video');
+                    mediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
                 }
 
                 let products = getProducts();
-                products.push({ 
+                products.unshift({ 
                     id: Date.now(), 
                     name, 
                     price, 
@@ -677,7 +672,7 @@
                 });
                 
                 if(saveProducts(products)) {
-                    alert(`Produk baru berhasil ditambahkan tanpa batasan ukuran!`);
+                    alert(`Produk baru berhasil ditambahkan!`);
                     event.target.reset();
                     switchTab('products');
                 }
