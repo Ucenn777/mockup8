@@ -473,8 +473,7 @@
                 let firstMedia = mediaList[0];
                 let mediaElement = "";
 
-                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video') || firstMedia.url.startsWith('blob:')));
-                if(isVideo) {
+                if(firstMedia.type === 'video') {
                     mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;"></video>`;
                 } else {
                     mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
@@ -518,8 +517,7 @@
             let indicator = document.getElementById('preview-indicator');
             let item = currentMediaList[currentMediaIndex];
 
-            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video') || item.url.startsWith('blob:')));
-            if(isVideo) {
+            if(item.type === 'video') {
                 container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
             } else {
                 container.innerHTML = `<img src="${item.url}" class="preview-display" onerror="this.src='${FALLBACK_IMG}'">`;
@@ -557,10 +555,24 @@
             document.getElementById("editModal").style.display = "none";
         }
 
-        async function readFileAsObjectUrl(file) {
+        // Fungsi Deteksi Jenis File yang Akurat (Mencegah Foto Galeri Terbaca Sebagai Video)
+        async function processFile(file) {
             return new Promise((resolve) => {
                 let fileUrl = URL.createObjectURL(file);
-                resolve(fileUrl);
+                let fileName = file.name.toLowerCase();
+                let fileType = file.type.toLowerCase();
+
+                // Cek ekstensi atau MIME type yang benar-benar video
+                let isVideo = fileType.includes('video') || 
+                              fileName.endsWith('.mp4') || 
+                              fileName.endsWith('.mkv') || 
+                              fileName.endsWith('.webm') || 
+                              fileName.endsWith('.avi') || 
+                              fileName.endsWith('.mov') || 
+                              fileName.endsWith('.3gp');
+
+                let type = isVideo ? 'video' : 'image';
+                resolve({ type: type, url: fileUrl });
             });
         }
 
@@ -580,14 +592,14 @@
             if(filesInput.files && filesInput.files.length > 0) {
                 let files = Array.from(filesInput.files);
                 for(let file of files) {
-                    let fileUrl = await readFileAsObjectUrl(file);
-                    let type = file.type.startsWith('video') ? 'video' : 'image';
-                    newMediaList.push({ type: type, url: fileUrl });
+                    let mediaObj = await processFile(file);
+                    newMediaList.push(mediaObj);
                 }
             }
 
             if(urlInput) {
-                let type = (urlInput.includes('.mp4') || urlInput.includes('video')) ? 'video' : 'image';
+                let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('.webm') || urlInput.includes('.mov') || urlInput.includes('video');
+                let type = isUrlVideo ? 'video' : 'image';
                 newMediaList.push({ type: type, url: urlInput });
             }
 
@@ -635,13 +647,13 @@
                 let mediaList = [];
                 
                 for(let file of files) {
-                    let fileUrl = await readFileAsObjectUrl(file);
-                    let type = file.type.startsWith('video') ? 'video' : 'image';
-                    mediaList.push({ type: type, url: fileUrl });
+                    let mediaObj = await processFile(file);
+                    mediaList.push(mediaObj);
                 }
 
                 if(urlInput) {
-                    let type = (urlInput.includes('.mp4') || urlInput.includes('video')) ? 'video' : 'image';
+                    let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('.webm') || urlInput.includes('.mov') || urlInput.includes('video');
+                    let type = isUrlVideo ? 'video' : 'image';
                     mediaList.push({ type: type, url: urlInput });
                 }
 
