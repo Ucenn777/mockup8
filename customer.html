@@ -219,7 +219,7 @@
         const FALLBACK_IMG = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80";
 
         const DEFAULT_PRODUCTS = [
-            { id: 1, name: "Mouse Gaming RGB", price: 150000, stock: 15, mediaList: [{ type: "image", url: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }], media: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }
+            { id: 1, name: "Mouse Gaming RGB", price: 150000, stock: 15, mediaList: [{ type: "image", url: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }] }
         ];
 
         function getProducts() { 
@@ -231,7 +231,20 @@
             try {
                 let parsed = JSON.parse(stored);
                 if(!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PRODUCTS;
-                return parsed;
+                
+                // Normalisasi data produk agar selalu memiliki struktur mediaList yang valid
+                return parsed.map(p => {
+                    let mList = [];
+                    if (p.mediaList && Array.isArray(p.mediaList) && p.mediaList.length > 0) {
+                        mList = p.mediaList;
+                    } else if (p.media) {
+                        let isVideo = p.media.includes('.mp4') || p.media.includes('video') || p.media.startsWith('data:video');
+                        mList = [{ type: isVideo ? 'video' : 'image', url: p.media }];
+                    } else {
+                        mList = [{ type: 'image', url: FALLBACK_IMG }];
+                    }
+                    return { ...p, mediaList: mList };
+                });
             } catch(e) {
                 return DEFAULT_PRODUCTS;
             }
@@ -241,7 +254,6 @@
         function getCart() { return JSON.parse(localStorage.getItem('toko_cart')) || []; }
         function saveCart(c) { localStorage.setItem('toko_cart', JSON.stringify(c)); }
 
-        // Sinkronisasi otomatis secara real-time jika ada perubahan data produk dari tab/halaman admin
         window.addEventListener('storage', function(e) {
             if (e.key === 'toko_products') {
                 renderProducts();
@@ -271,20 +283,12 @@
                 return;
             }
             products.forEach(p => {
-                let mediaList = [];
-                if(p.mediaList && Array.isArray(p.mediaList) && p.mediaList.length > 0) {
-                    mediaList = p.mediaList;
-                } else if(p.media) {
-                    let isUrlVideo = p.media.includes('.mp4') || p.media.includes('video');
-                    mediaList = [{ type: isUrlVideo ? 'video' : 'image', url: p.media }];
-                } else {
-                    mediaList = [{ type: 'image', url: FALLBACK_IMG }];
-                }
-
+                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
                 let firstMedia = mediaList[0];
                 let mediaHtml = "";
                 
-                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video')));
+                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video') || firstMedia.url.startsWith('data:video')));
+                
                 if (isVideo) {
                     mediaHtml = `<video src="${firstMedia.url}" class="product-video" muted></video>`;
                 } else {
@@ -323,7 +327,7 @@
             
             detailMediaList = currentActiveProduct.mediaList && currentActiveProduct.mediaList.length > 0 
                 ? currentActiveProduct.mediaList 
-                : [{ type: 'image', url: currentActiveProduct.media || FALLBACK_IMG }];
+                : [{ type: 'image', url: FALLBACK_IMG }];
             
             detailMediaIdx = 0;
             renderDetailMedia();
@@ -352,7 +356,8 @@
             const indicator = document.getElementById("detail-media-indicator");
             let item = detailMediaList[detailMediaIdx];
 
-            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video')));
+            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video') || item.url.startsWith('data:video')));
+            
             if (isVideo) {
                 container.innerHTML = `<video src="${item.url}" class="detail-video" controls autoplay></video>`;
             } else {
@@ -397,7 +402,8 @@
             let indicator = document.getElementById('preview-indicator');
             let item = previewMediaList[previewMediaIdx];
 
-            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video')));
+            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video') || item.url.startsWith('data:video')));
+            
             if (isVideo) {
                 container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
             } else {
@@ -428,7 +434,7 @@
                     return;
                 }
                 let cart = getCart();
-                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: p.media || FALLBACK_IMG }];
+                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
                 let mediaSrc = mediaList[0].url;
                 
                 let existing = cart.find(item => item.id === p.id);
