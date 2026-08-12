@@ -32,7 +32,7 @@
         .hero h1 { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px; color: #ea580c; text-transform: uppercase; }
         .hero p { font-size: 10px; color: #4b5563; }
 
-        /* Banner Iklan Kompak & Tanpa Tombol Beli */
+        /* Banner Iklan Kompak & Bisa Diklik untuk Preview */
         .ad-slider-section {
             width: 100%;
             max-width: 1200px;
@@ -55,6 +55,7 @@
             align-items: center;
             gap: 12px;
             transition: opacity 0.3s ease-in-out;
+            cursor: pointer;
         }
         .ad-img-box {
             width: 100px;
@@ -68,10 +69,12 @@
             align-items: center;
             justify-content: center;
         }
-        .ad-img-box img, .ad-img-box video {
+        .ad-img-box img, .ad-img-box video, .ad-img-box iframe {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border: none;
+            pointer-events: none;
         }
         .ad-info-box { flex: 1; min-width: 0; }
         .ad-badge {
@@ -101,7 +104,7 @@
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 12px; }
         .section-title { font-size: 13px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 12px; color: #111; text-transform: uppercase; border-left: 3px solid #f97316; padding-left: 6px; }
 
-        /* PERBAIKAN UTAMA: Grid Produk 2 Kolom Kiri-Kanan ala Shopee */
+        /* Grid Produk 2 Kolom Kiri-Kanan ala Shopee */
         .product-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -117,12 +120,12 @@
 
         .product-card { 
             background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; 
-            display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s;
+            display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s;
         }
         .product-card:hover { border-color: #f97316; box-shadow: 0 4px 10px rgba(249,115,22,0.1); }
 
-        .product-img-wrap { width: 100%; height: 140px; overflow: hidden; border-radius: 6px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; position: relative; }
-        .product-img, .product-video { width: 100%; height: 100%; object-fit: cover; }
+        .product-img-wrap { width: 100%; height: 140px; overflow: hidden; border-radius: 6px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+        .product-img, .product-video, .product-iframe { width: 100%; height: 100%; object-fit: cover; border: none; pointer-events: none; }
 
         .product-name { font-size: 11px; font-weight: bold; margin: 6px 0 3px 0; color: #1f2937; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 28px; }
         .product-price { font-size: 12px; font-weight: bold; color: #ea580c; margin-bottom: 2px; }
@@ -144,6 +147,15 @@
             background: #fff; border-radius: 8px; max-width: 400px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 15px; position: relative; 
         }
         .close-modal { position: absolute; top: 10px; right: 10px; background: #f3f4f6; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 10; font-size: 11px; }
+
+        /* Modal Preview Media / Galeri / Video */
+        .preview-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
+        .preview-content { position: relative; max-width: 500px; width: 100%; text-align: center; color: #fff; }
+        .preview-display { width: 100%; max-height: 65vh; object-fit: contain; border-radius: 6px; background: #000; border: none; }
+        .preview-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+        .nav-btn { background: #f97316; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 10px; }
+        .nav-btn:hover { background: #ea580c; }
+        .close-preview { position: absolute; top: -35px; right: 0; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; }
 
         .form-group { margin-bottom: 10px; text-align: left; }
         .form-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 3px; color: #4b5563; text-transform: uppercase; }
@@ -185,10 +197,10 @@
 
     <section class="ad-slider-section">
         <div class="ad-slider-container-inner">
-            <button class="ad-nav-btn ad-prev" onclick="prevAd()">❮</button>
-            <button class="ad-nav-btn ad-next" onclick="nextAd()">❯</button>
+            <button class="ad-nav-btn ad-prev" onclick="prevAd(); event.stopPropagation();">❮</button>
+            <button class="ad-nav-btn ad-next" onclick="nextAd(); event.stopPropagation();">❯</button>
             
-            <div class="ad-slider-wrapper" id="ad-wrapper-box">
+            <div class="ad-slider-wrapper" id="ad-wrapper-box" onclick="openBannerPreview()" title="Klik untuk perbesar media">
                 <div class="ad-img-box" id="ad-media-box">
                     <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" id="ad-img" alt="Iklan Produk">
                 </div>
@@ -216,6 +228,18 @@
             </div>
         </div>
     </main>
+
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <button class="close-preview" onclick="closePreviewModal()">&times;</button>
+            <div id="preview-container"></div>
+            <div class="preview-nav" id="preview-nav-controls">
+                <button class="nav-btn" onclick="prevMediaModal()">◀ Sebelumnya</button>
+                <span id="preview-indicator" style="font-size: 11px; font-weight: bold;">1 / 1</span>
+                <button class="nav-btn" onclick="nextMediaModal()">Selanjutnya ▶</button>
+            </div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="cart-modal">
         <div class="modal-content">
@@ -314,12 +338,46 @@
         let currentAdIndex = 0;
         let adTimer = null;
 
+        let activeModalMediaList = [];
+        let activeModalIndex = 0;
+
         window.onload = function() { 
             renderProducts(); 
             updateCartBadge(); 
             initAdSlider();
             renderCustomerOrders();
         };
+
+        // Konversi Link YouTube & Video Pintar untuk Tampilan Bersih
+        function getEmbedMediaHtml(media, cssClass) {
+            let url = media.url || "";
+            let type = media.type;
+
+            // Deteksi Link YouTube
+            if (url.includes("youtube.com") || url.includes("youtu.be")) {
+                let videoId = "";
+                if (url.includes("youtu.be/")) {
+                    videoId = url.split("youtu.be/")[1]?.split("?")[0];
+                } else if (url.includes("watch?v=")) {
+                    videoId = url.split("watch?v=")[1]?.split("&")[0];
+                } else if (url.includes("embed/")) {
+                    videoId = url.split("embed/")[1]?.split("?")[0];
+                }
+                
+                if (videoId) {
+                    let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0`;
+                    return `<iframe src="${embedUrl}" class="${cssClass}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                }
+            }
+
+            // Deteksi Format Video Lain / MP4
+            if (type === 'video' || url.endsWith('.mp4') || url.includes('video')) {
+                return `<video src="${url}" class="${cssClass}" controls autoplay muted loop></video>`;
+            }
+
+            // Default Gambar
+            return `<img src="${url}" class="${cssClass}" onerror="this.src='${FALLBACK_IMG}'">`;
+        }
 
         function initAdSlider() {
             let products = getProducts();
@@ -348,15 +406,9 @@
             const adStock = document.getElementById("ad-stock");
             const wrapperBox = document.getElementById("ad-wrapper-box");
 
-            let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video')));
-
             wrapperBox.style.opacity = 0;
             setTimeout(() => {
-                if (isVideo) {
-                    mediaBox.innerHTML = `<video src="${firstMedia.url}" class="product-video" autoplay muted loop></video>`;
-                } else {
-                    mediaBox.innerHTML = `<img src="${firstMedia.url}" alt="${p.name}" onerror="this.src='${FALLBACK_IMG}'">`;
-                }
+                mediaBox.innerHTML = getEmbedMediaHtml(firstMedia, 'product-img');
                 adTitle.innerText = p.name;
                 adPrice.innerText = "Rp " + p.price.toLocaleString('id-ID');
                 adStock.innerText = "Stok Tersedia: " + p.stock + " pcs";
@@ -366,6 +418,14 @@
             updateAdDotsActive();
         }
 
+        function openBannerPreview() {
+            let products = getProducts();
+            if(products.length === 0) return;
+            let p = products[currentAdIndex];
+            let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
+            openPreviewModal(mediaList, 0);
+        }
+
         function setupAdDots() {
             let products = getProducts();
             const dotsContainer = document.getElementById("ad-dots-container");
@@ -373,7 +433,7 @@
             products.forEach((_, idx) => {
                 let dot = document.createElement("div");
                 dot.className = "ad-dot " + (idx === currentAdIndex ? 'active' : '');
-                dot.onclick = () => { currentAdIndex = idx; renderCurrentAd(); resetAdTimer(); };
+                dot.onclick = (e) => { e.stopPropagation(); currentAdIndex = idx; renderCurrentAd(); resetAdTimer(); };
                 dotsContainer.appendChild(dot);
             });
         }
@@ -418,15 +478,19 @@
             products.forEach(p => {
                 let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
                 let firstMedia = mediaList[0];
-                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video')));
-                
-                let mediaHtml = isVideo ? `<video src="${firstMedia.url}" class="product-video" muted></video>` : `<img src="${firstMedia.url}" class="product-img" onerror="this.src='${FALLBACK_IMG}'">`;
+                let mediaHtml = getEmbedMediaHtml(firstMedia, 'product-img');
                 let isHabis = p.stock <= 0;
+
+                // Konversi objek media ke string aman untuk dikirim ke fungsi preview modal
+                let encodedMedia = encodeURIComponent(JSON.stringify(mediaList));
 
                 grid.innerHTML += `
                     <div class="product-card">
                         <div>
-                            <div class="product-img-wrap">${mediaHtml}</div>
+                            <div class="product-img-wrap" onclick="openPreviewModal('${encodedMedia}', 0)" title="Klik untuk lihat foto/video">
+                                ${mediaHtml}
+                                ${mediaList.length > 1 ? `<span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.7); color:#fff; font-size:8px; padding:2px 5px; border-radius:3px;">🔍 ${mediaList.length} File</span>` : ''}
+                            </div>
                             <div class="product-name">${p.name}</div>
                             <div class="product-price">Rp ${p.price.toLocaleString('id-ID')}</div>
                             <div class="product-stock">Stok: ${p.stock} pcs</div>
@@ -443,6 +507,52 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        // Modal Preview Interaktif untuk Thumbnail & Banner
+        function openPreviewModal(mediaInput, index) {
+            if (typeof mediaInput === 'string') {
+                try {
+                    activeModalMediaList = JSON.parse(decodeURIComponent(mediaInput));
+                } catch(e) {
+                    activeModalMediaList = [{ type: 'image', url: FALLBACK_IMG }];
+                }
+            } else {
+                activeModalMediaList = mediaInput;
+            }
+            activeModalIndex = index || 0;
+            document.getElementById('previewModal').style.display = 'flex';
+            displayModalMedia();
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function displayModalMedia() {
+            let container = document.getElementById('preview-container');
+            let indicator = document.getElementById('preview-indicator');
+            let navControls = document.getElementById('preview-nav-controls');
+            let item = activeModalMediaList[activeModalIndex];
+
+            container.innerHTML = getEmbedMediaHtml(item, 'preview-display');
+            indicator.innerText = `${activeModalIndex + 1} / ${activeModalMediaList.length}`;
+            
+            navControls.style.display = activeModalMediaList.length > 1 ? 'flex' : 'none';
+        }
+
+        function nextMediaModal() {
+            if(activeModalMediaList.length > 1) {
+                activeModalIndex = (activeModalIndex + 1) % activeModalMediaList.length;
+                displayModalMedia();
+            }
+        }
+
+        function prevMediaModal() {
+            if(activeModalMediaList.length > 1) {
+                activeModalIndex = (activeModalIndex - 1 + activeModalMediaList.length) % activeModalMediaList.length;
+                displayModalMedia();
+            }
+        }
+
         function quickAdd(id) {
             let p = getProducts().find(item => item.id === id);
             if (p) {
@@ -455,7 +565,7 @@
                     if(existing.qty < p.stock) existing.qty++;
                     else { alert("Jumlah di keranjang sudah mencapai batas stok!"); return; }
                 } else {
-                    cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, img: mediaList[0].url });
+                    cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, mediaList: mediaList });
                 }
 
                 saveCart(cart);
@@ -468,7 +578,8 @@
             let p = getProducts().find(item => item.id === id);
             if (p) {
                 if(p.stock <= 0) { alert("Maaf, stok produk ini telah habis!"); return; }
-                checkoutTargetItems = [{ id: p.id, name: p.name, price: p.price, qty: 1 }];
+                let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
+                checkoutTargetItems = [{ id: p.id, name: p.name, price: p.price, qty: 1, mediaList: mediaList }];
                 openCheckoutModal();
             }
         }
