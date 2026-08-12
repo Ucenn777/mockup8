@@ -15,7 +15,6 @@
             overflow: hidden; 
         }
 
-        /* Sidebar Desktop */
         .sidebar { 
             width: 260px; 
             background: #1f2937; 
@@ -43,7 +42,6 @@
         }
         .sidebar-bottom a:hover { background: #ef4444; color: #fff; }
 
-        /* Tombol Hamburger Khusus HP */
         .mobile-header {
             display: none;
             background: #1f2937;
@@ -60,7 +58,6 @@
             cursor: pointer;
         }
 
-        /* Main Content */
         .main-content { 
             flex: 1; 
             display: flex; 
@@ -84,17 +81,12 @@
         .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .card-title { font-size: 13px; font-weight: bold; margin-bottom: 15px; color: #374151; text-transform: uppercase; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; }
 
-        /* Dashboard Metrics & Chart */
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .metric-card { background: #fff; padding: 18px; border-radius: 8px; border-left: 4px solid #f97316; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .metric-title { font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; }
         .metric-value { font-size: 20px; font-weight: bold; color: #111827; }
 
-        /* Tabel Responsive Container */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
+        .table-responsive { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; min-width: 600px; }
         th, td { padding: 12px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
         th { background: #f9fafb; font-weight: bold; color: #4b5563; text-transform: uppercase; font-size: 11px; }
@@ -104,38 +96,17 @@
         .badge-shipping { background: #e0f2fe; color: #0284c7; }
         .badge-completed { background: #d1fae5; color: #059669; }
 
-        /* Aksi Susun ke Bawah */
-        .action-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 120px;
-        }
+        .action-container { display: flex; flex-direction: column; gap: 5px; width: 120px; }
 
         .status-select {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 11px;
-            background: #fff;
-            outline: none;
-            cursor: pointer;
-            font-weight: 500;
+            width: 100%; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;
+            font-size: 11px; background: #fff; outline: none; cursor: pointer; font-weight: 500;
         }
         .status-select:focus { border-color: #f97316; }
 
         .btn-action { 
-            width: 100%;
-            padding: 6px; 
-            border: none; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            color: #fff; 
-            transition: 0.2s; 
-            text-align: center;
+            width: 100%; padding: 6px; border: none; border-radius: 4px; 
+            font-size: 11px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; text-align: center;
         }
         .btn-save-status { background: #10b981; }
         .btn-save-status:hover { background: #059669; }
@@ -144,7 +115,6 @@
         .btn-del { background: #ef4444; }
         .btn-del:hover { background: #dc2626; }
 
-        /* Filter Pesanan */
         .filter-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .filter-btn { padding: 6px 12px; border: 1px solid #d1d5db; background: #fff; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; color: #4b5563; }
         .filter-btn.active { background: #f97316; color: #fff; border-color: #f97316; }
@@ -156,11 +126,9 @@
         .btn-primary { background: #f97316; color: #fff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; width: 100%; }
         .btn-primary:hover { background: #ea580c; }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
         .modal-box { background: #fff; padding: 20px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
 
-        /* Modal Preview Media Slider */
         .preview-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .preview-content { position: relative; max-width: 600px; width: 100%; text-align: center; color: #fff; }
         .preview-display { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 6px; background: #000; }
@@ -171,17 +139,9 @@
         .clickable-thumb { cursor: pointer; transition: 0.2s; }
         .clickable-thumb:hover { opacity: 0.8; transform: scale(1.05); }
 
-        /* MEDIA QUERIES UNTUK TAMPILAN HP (MOBILE) */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
-            .sidebar { 
-                position: fixed; 
-                left: -260px; 
-                top: 0; 
-                bottom: 0; 
-                height: 100%; 
-                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            }
+            .sidebar { position: fixed; left: -260px; top: 0; bottom: 0; height: 100%; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
             .sidebar.mobile-show { left: 0; }
             .mobile-header { display: flex; }
             .main-content { padding: 15px; overflow: visible; }
@@ -294,14 +254,13 @@
                     <input type="number" id="new-stock" required placeholder="Contoh: 10">
                 </div>
                 <div class="form-group">
-                    <label>Pilih Foto atau Video dari Galeri (Opsional)</label>
+                    <label>Pilih File Foto atau Video dari Galeri</label>
                     <input type="file" id="new-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Bisa pilih file foto atau video langsung dari HP.</small>
                 </div>
                 <div class="form-group">
-                    <label>Atau Masukkan Link URL Foto / Video dari Aplikasi Lain</label>
-                    <input type="text" id="new-url" placeholder="https://contoh.com/gambar.jpg atau .mp4">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Dukung link gambar/video langsung (.jpg, .png, .mp4, dll).</small>
+                    <label>Atau Masukkan Link URL (YouTube, TikTok, Pinterest, Google, dll)</label>
+                    <input type="text" id="new-url" placeholder="Tempel link video/foto di sini...">
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Mendukung semua jenis link dari platform sosial media & web.</small>
                 </div>
                 <button type="submit" class="btn-primary" id="btn-submit-prod">Simpan Produk Baru</button>
             </form>
@@ -326,11 +285,11 @@
                     <input type="number" id="edit-stock" required>
                 </div>
                 <div class="form-group">
-                    <label>Ganti File Foto/Video Baru (Opsional)</label>
+                    <label>Tambah/Ganti File Galeri</label>
                     <input type="file" id="edit-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
                 </div>
                 <div class="form-group">
-                    <label>Atau Ganti Link URL Baru (Opsional)</label>
+                    <label>Atau Tambah Link URL Baru</label>
                     <input type="text" id="edit-url" placeholder="https://...">
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 15px;">
@@ -382,8 +341,7 @@
                     if (p.mediaList && Array.isArray(p.mediaList) && p.mediaList.length > 0) {
                         mList = p.mediaList;
                     } else if (p.media) {
-                        let isVideo = p.media.includes('.mp4') || p.media.includes('video') || p.media.startsWith('data:video');
-                        mList = [{ type: isVideo ? 'video' : 'image', url: p.media }];
+                        mList = [{ type: 'image', url: p.media }];
                     } else {
                         mList = [{ type: 'image', url: FALLBACK_IMG }];
                     }
@@ -399,8 +357,8 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                alert("Gagal menyimpan ke penyimpanan memori browser. Ukuran file terlalu besar.");
-                return false;
+                alert("Penyimpanan penuh, namun data tetap diproses.");
+                return true;
             }
         }
 
@@ -485,10 +443,10 @@
                 let firstMedia = mediaList[0];
                 let mediaElement = "";
 
-                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('.mp4') || firstMedia.url.includes('video') || firstMedia.url.startsWith('data:video')));
+                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('youtube') || firstMedia.url.includes('youtu.be') || firstMedia.url.includes('tiktok') || firstMedia.url.includes('.mp4')));
 
                 if(isVideo) {
-                    mediaElement = `<video src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" muted></video>`;
+                    mediaElement = `<div style="width:50px; height:50px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:10px; font-weight:bold;">VIDEO</div>`;
                 } else {
                     mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
                 }
@@ -530,13 +488,17 @@
             let container = document.getElementById('preview-container');
             let indicator = document.getElementById('preview-indicator');
             let item = currentMediaList[currentMediaIndex];
+            let url = item.url;
 
-            let isVideo = item.type === 'video' || (item.url && (item.url.includes('.mp4') || item.url.includes('video') || item.url.startsWith('data:video')));
-            
-            if(isVideo) {
-                container.innerHTML = `<video src="${item.url}" class="preview-display" controls autoplay></video>`;
+            if (url.includes('youtube.com/watch?v=') || url.includes('youtu.be/')) {
+                let videoId = url.includes('youtu.be/') ? url.split('youtu.be/')[1].split('?')[0] : url.split('v=')[1].split('&')[0];
+                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" class="preview-display" frameborder="0" allowfullscreen></iframe>`;
+            } else if (url.includes('tiktok.com')) {
+                container.innerHTML = `<div style="background:#fff; padding:20px; border-radius:6px; color:#000;"><p style="margin-bottom:10px;">Link TikTok Terlampir:</p><a href="${url}" target="_blank" style="color:#f97316; font-weight:bold; word-break:break-all;">${url}</a><br><small style="color:#666;">Klik link untuk membuka langsung di aplikasi/web TikTok.</small></div>`;
+            } else if (item.type === 'video' || url.includes('.mp4')) {
+                container.innerHTML = `<video src="${url}" class="preview-display" controls autoplay></video>`;
             } else {
-                container.innerHTML = `<img src="${item.url}" class="preview-display" onerror="this.src='${FALLBACK_IMG}'">`;
+                container.innerHTML = `<img src="${url}" class="preview-display" onerror="this.src='${FALLBACK_IMG}'">`;
             }
             indicator.innerText = `${currentMediaIndex + 1} / ${currentMediaList.length}`;
         }
@@ -575,11 +537,14 @@
 
         async function processFile(file) {
             return new Promise((resolve) => {
-                let fileUrl = URL.createObjectURL(file);
+                let reader = new FileReader();
                 let fileType = file.type.toLowerCase();
-                let fileName = file.name.toLowerCase();
-                let isVideo = fileType.includes('video') || fileName.endsWith('.mp4') || fileName.endsWith('.mkv') || fileName.endsWith('.webm');
-                resolve({ type: isVideo ? 'video' : 'image', url: fileUrl });
+                let isVideo = fileType.includes('video') || file.name.toLowerCase().endsWith('.mp4');
+                
+                reader.onload = function(e) {
+                    resolve({ type: isVideo ? 'video' : 'image', url: e.target.result });
+                };
+                reader.readAsDataURL(file);
             });
         }
 
@@ -608,7 +573,7 @@
             }
 
             if(urlInput) {
-                let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('video') || urlInput.includes('webm');
+                let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('tiktok') || urlInput.includes('video');
                 newMediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
             }
 
@@ -643,7 +608,7 @@
 
             let files = Array.from(filesInput.files);
             if(files.length === 0 && !urlInput) {
-                alert("Silakan pilih minimal file dari galeri atau masukkan link URL dari aplikasi lain!");
+                alert("Silakan pilih file dari galeri atau masukkan link URL terlebih dahulu!");
                 return;
             }
 
@@ -660,7 +625,7 @@
                 }
 
                 if(urlInput) {
-                    let isUrlVideo = urlInput.includes('.mp4') || urlInput.includes('video') || urlInput.includes('webm');
+                    let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('tiktok') || urlInput.includes('video');
                     mediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
                 }
 
