@@ -129,7 +129,7 @@
 
         .preview-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .preview-content { position: relative; max-width: 600px; width: 100%; text-align: center; color: #fff; }
-        .preview-display { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 6px; background: #000; }
+        .preview-display { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 6px; background: #000; border: none; }
         .preview-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .nav-btn { background: #f97316; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
         .nav-btn:hover { background: #ea580c; }
@@ -166,14 +166,14 @@
             </ul>
         </div>
         <div class="sidebar-bottom">
-            <a href="index.html">🚪 Keluar ke Pilih Login</a>
+            <a href="index.html">🚪 Keluar ke Toko</a>
         </div>
     </div>
 
     <div class="main-content">
         <div class="header-top">
             <h1 id="page-title">Dashboard Grafik & Statistik</h1>
-            <a href="customer.html" target="_blank" style="font-size: 12px; color: #f97316; text-decoration: none; font-weight: bold;">🔗 Lihat Halaman Toko</a>
+            <a href="index.html" target="_blank" style="font-size: 12px; color: #f97316; text-decoration: none; font-weight: bold;">🔗 Lihat Halaman Toko</a>
         </div>
 
         <div id="tab-dashboard" class="card">
@@ -199,7 +199,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Media (Klik untuk Geser)</th>
+                            <th>Media (Klik Preview)</th>
                             <th>Nama Barang</th>
                             <th>Harga</th>
                             <th>Stok</th>
@@ -255,9 +255,9 @@
                     <input type="file" id="new-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
                 </div>
                 <div class="form-group">
-                    <label>Atau Masukkan Link URL (YouTube, TikTok, Pinterest, Google, dll)</label>
-                    <input type="text" id="new-url" placeholder="Tempel link video/foto di sini...">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Mendukung semua jenis link dari platform sosial media & web.</small>
+                    <label>Atau Masukkan Link URL YouTube / Video Lainnya</label>
+                    <input type="text" id="new-url" placeholder="https://www.youtube.com/watch?v=...">
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Mendukung link YouTube (watch / youtu.be) dan file video lainnya.</small>
                 </div>
                 <button type="submit" class="btn-primary" id="btn-submit-prod">Simpan Produk Baru</button>
             </form>
@@ -286,7 +286,7 @@
                     <input type="file" id="edit-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
                 </div>
                 <div class="form-group">
-                    <label>Atau Tambah Link URL Baru</label>
+                    <label>Atau Tambah Link URL YouTube Baru</label>
                     <input type="text" id="edit-url" placeholder="https://...">
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 15px;">
@@ -354,14 +354,8 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                try {
-                    localStorage.removeItem('toko_cart');
-                    localStorage.setItem('toko_products', JSON.stringify(p));
-                    return true;
-                } catch (err) {
-                    alert("Penyimpanan memori browser penuh! Disarankan menggunakan link URL eksternal.");
-                    return true;
-                }
+                alert("Penyimpanan memori browser penuh! Disarankan menggunakan link URL YouTube eksternal.");
+                return true;
             }
         }
 
@@ -433,6 +427,34 @@
             });
         }
 
+        // Konversi Link YouTube untuk Preview Admin
+        function getEmbedMediaHtmlAdmin(media, cssClass) {
+            let url = media.url || "";
+            let type = media.type;
+
+            if (url.includes("youtube.com") || url.includes("youtu.be")) {
+                let videoId = "";
+                if (url.includes("youtu.be/")) {
+                    videoId = url.split("youtu.be/")[1]?.split("?")[0];
+                } else if (url.includes("watch?v=")) {
+                    videoId = url.split("watch?v=")[1]?.split("&")[0];
+                } else if (url.includes("embed/")) {
+                    videoId = url.split("embed/")[1]?.split("?")[0];
+                }
+                
+                if (videoId) {
+                    let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0`;
+                    return `<iframe src="${embedUrl}" class="${cssClass}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                }
+            }
+
+            if (type === 'video' || url.endsWith('.mp4') || url.includes('video')) {
+                return `<video src="${url}" class="${cssClass}" controls></video>`;
+            }
+
+            return `<img src="${url}" class="${cssClass}" onerror="this.src='${FALLBACK_IMG}'">`;
+        }
+
         function renderAdminProducts() {
             let products = getProducts();
             let tbody = document.getElementById("admin-product-table");
@@ -444,12 +466,12 @@
             products.forEach((p) => {
                 let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
                 let firstMedia = mediaList[0];
+                
+                let isVideo = firstMedia.url.includes('youtube') || firstMedia.url.includes('youtu.be') || firstMedia.type === 'video';
                 let mediaElement = "";
 
-                let isVideo = firstMedia.type === 'video' || (firstMedia.url && (firstMedia.url.includes('youtube') || firstMedia.url.includes('youtu.be') || firstMedia.url.includes('tiktok') || firstMedia.url.includes('.mp4')));
-
                 if(isVideo) {
-                    mediaElement = `<div style="width:50px; height:50px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:10px; font-weight:bold;">VIDEO</div>`;
+                    mediaElement = `<div style="width:50px; height:50px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:9px; font-weight:bold; border:1px solid #f97316;">YT / VID</div>`;
                 } else {
                     mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
                 }
@@ -491,18 +513,8 @@
             let container = document.getElementById('preview-container');
             let indicator = document.getElementById('preview-indicator');
             let item = currentMediaList[currentMediaIndex];
-            let url = item.url;
 
-            if (url.includes('youtube.com/watch?v=') || url.includes('youtu.be/')) {
-                let videoId = url.includes('youtu.be/') ? url.split('youtu.be/')[1].split('?')[0] : url.split('v=')[1].split('&')[0];
-                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" class="preview-display" frameborder="0" allowfullscreen></iframe>`;
-            } else if (url.includes('tiktok.com')) {
-                container.innerHTML = `<div style="background:#fff; padding:20px; border-radius:6px; color:#000;"><p style="margin-bottom:10px;">Link TikTok Terlampir:</p><a href="${url}" target="_blank" style="color:#f97316; font-weight:bold; word-break:break-all;">${url}</a></div>`;
-            } else if (item.type === 'video' || url.includes('.mp4')) {
-                container.innerHTML = `<video src="${url}" class="preview-display" controls autoplay></video>`;
-            } else {
-                container.innerHTML = `<img src="${url}" class="preview-display" onerror="this.src='${FALLBACK_IMG}'">`;
-            }
+            container.innerHTML = getEmbedMediaHtmlAdmin(item, 'preview-display');
             indicator.innerText = `${currentMediaIndex + 1} / ${currentMediaList.length}`;
         }
 
@@ -581,7 +593,7 @@
             }
 
             if(urlInput) {
-                let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('tiktok') || urlInput.includes('video');
+                let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('video');
                 newMediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
             }
 
@@ -632,7 +644,7 @@
                 }
 
                 if(urlInput) {
-                    let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('tiktok') || urlInput.includes('video');
+                    let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('video');
                     mediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
                 }
 
@@ -683,11 +695,7 @@
             }
 
             filtered.forEach((ord) => {
-                let statusBadge = 'badge-pending';
                 let currentStatus = ord.status || 'Pending';
-                if(currentStatus === 'Sedang Dikirim') statusBadge = 'badge-shipping';
-                if(currentStatus === 'Selesai') statusBadge = 'badge-completed';
-
                 let itemsList = ord.items.map(i => `• ${i.name} (Rp ${i.price.toLocaleString('id-ID')} x ${i.qty || 1})`).join("<br>");
                 let buyer = ord.buyer || { name: 'Customer', phone: '-', address: '-', payment: '-' };
                 
@@ -711,7 +719,6 @@
             });
         }
 
-        // Fungsi Update Status Otomatis Tanpa Tombol Simpan/Hapus
         function updateOrderStatusOtomatis(orderId, newStatus) {
             let orders = getOrders();
             let ord = orders.find(o => o.orderId === orderId);
