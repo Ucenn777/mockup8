@@ -8,136 +8,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { width: 100%; min-height: 100vh; background-color: #f8f9fa; color: #222; overflow-x: hidden; }
         
-        /* Banner Iklan / Hero Slider yang Lebih Besar, Interaktif & Bisa Digeser */
-        .ad-slider-section {
-            width: 100%;
-            background: linear-gradient(135deg, #1f2937, #111827);
-            padding: 25px 5%;
-            color: #fff;
-            border-bottom: 3px solid #f97316;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            position: relative;
-        }
-        .ad-slider-wrapper {
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            gap: 25px;
-            position: relative;
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease-in-out;
-        }
-        .ad-img-box {
-            width: 140px;
-            height: 140px;
-            border-radius: 8px;
-            overflow: hidden;
-            flex-shrink: 0;
-            background: #000;
-            border: 2px solid #f97316;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .ad-img-box img, .ad-img-box video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .ad-info-box {
-            flex: 1;
-        }
-        .ad-badge {
-            background: #f97316;
-            color: #fff;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            display: inline-block;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-        .ad-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 6px;
-        }
-        .ad-price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #f97316;
-            margin-bottom: 6px;
-        }
-        .ad-desc {
-            font-size: 12px;
-            color: #d1d5db;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-        .ad-btn {
-            background: #f97316;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-        .ad-btn:hover { background: #ea580c; }
-
-        /* Tombol Navigasi Geser Banner (Kiri & Kanan) */
-        .ad-nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.6);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            z-index: 10;
-        }
-        .ad-nav-btn:hover { background: #f97316; border-color: #f97316; }
-        .ad-prev { left: 10px; }
-        .ad-next { right: 10px; }
-        
-        .ad-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 12px;
-        }
-        .ad-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .ad-dot.active {
-            background: #f97316;
-            width: 20px;
-            border-radius: 4px;
-        }
-        
         header { 
             background: #fff; border-bottom: 1px solid #e5e7eb; padding: 15px 5%; 
             display: flex; align-items: center; justify-content: space-between; 
@@ -163,6 +33,142 @@
         .hero { background: #fff7ed; text-align: center; padding: 25px 20px; border-bottom: 1px solid #ffedd5; }
         .hero h1 { font-size: 20px; font-weight: bold; letter-spacing: 2px; margin-bottom: 4px; color: #ea580c; text-transform: uppercase; }
         .hero p { font-size: 12px; color: #4b5563; }
+
+        /* Banner Iklan / Hero Slider Lebih Besar & Berada di Bawah Koleksi Pilihan */
+        .ad-slider-section {
+            width: 100%;
+            max-width: 1400px;
+            margin: 25px auto 10px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+        .ad-slider-container-inner {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border-radius: 16px;
+            padding: 30px;
+            color: #fff;
+            border: 2px solid #f97316;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .ad-slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .ad-img-box {
+            width: 220px;
+            height: 220px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #000;
+            border: 2px solid #f97316;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ad-img-box img, .ad-img-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ad-info-box {
+            flex: 1;
+        }
+        .ad-badge {
+            background: #f97316;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .ad-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .ad-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f97316;
+            margin-bottom: 8px;
+        }
+        .ad-stock {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+        .ad-desc {
+            font-size: 13px;
+            color: #d1d5db;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .ad-btn {
+            background: #f97316;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        .ad-btn:hover { background: #ea580c; }
+
+        /* Tombol Navigasi Geser Banner (Kiri & Kanan) */
+        .ad-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s;
+            z-index: 10;
+        }
+        .ad-nav-btn:hover { background: #f97316; border-color: #f97316; }
+        .ad-prev { left: 5px; }
+        .ad-next { right: 5px; }
+        
+        .ad-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .ad-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: background 0.2s, width 0.2s;
+        }
+        .ad-dot.active {
+            background: #f97316;
+            width: 25px;
+            border-radius: 5px;
+        }
 
         .container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 20px; }
         .section-title { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 20px; color: #111; text-transform: uppercase; border-left: 4px solid #f97316; padding-left: 10px; }
@@ -224,7 +230,7 @@
         .nav-btn:hover { background: #ea580c; }
         .close-preview { position: absolute; top: -40px; right: 0; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             header { padding: 10px 15px; }
             .logo { font-size: 16px; }
             .search-bar { order: 3; width: 100%; max-width: 100%; margin-top: 5px; }
@@ -233,34 +239,15 @@
             .detail-flex { flex-direction: column; }
             .detail-img-area { width: 100%; }
             .detail-img, .detail-video { height: 220px; }
-            .ad-slider-wrapper { flex-direction: column; text-align: center; gap: 15px; padding: 15px; }
-            .ad-img-box { width: 120px; height: 120px; margin: 0 auto; }
+            .ad-slider-wrapper { flex-direction: column; text-align: center; gap: 15px; }
+            .ad-img-box { width: 150px; height: 150px; margin: 0 auto; }
+            .ad-slider-container-inner { padding: 20px 10px; }
         }
 
         footer { background: #fff; color: #6b7280; text-align: center; padding: 20px; font-size: 11px; border-top: 1px solid #e5e7eb; margin-top: 30px; }
     </style>
 </head>
 <body>
-
-    <section class="ad-slider-section">
-        <button class="ad-nav-btn ad-prev" onclick="prevAd()">❮</button>
-        <button class="ad-nav-btn ad-next" onclick="nextAd()">❯</button>
-        
-        <div class="ad-slider-wrapper" id="ad-wrapper-box">
-            <div class="ad-img-box" id="ad-media-box">
-                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" id="ad-img" alt="Iklan Produk">
-            </div>
-            <div class="ad-info-box">
-                <span class="ad-badge">🔥 Promo Unggulan Toko</span>
-                <div class="ad-title" id="ad-title">Selamat Datang di Toko Ucen Jaya</div>
-                <div class="ad-price" id="ad-price"></div>
-                <div class="ad-desc" id="ad-desc">Temukan berbagai barang berkualitas dengan penawaran harga terbaik hari ini!</div>
-                <button class="ad-btn" id="ad-action-btn" onclick="openAdProductDetail()">Lihat Detail & Beli</button>
-            </div>
-        </div>
-
-        <div class="ad-indicators" id="ad-dots-container"></div>
-    </section>
 
     <header>
         <div class="logo" onclick="resetView()">TOKO UCEN JAYA</div>
@@ -277,6 +264,29 @@
     <section class="hero">
         <h1>KOLEKSI PILIHAN TOKO UCEN JAYA</h1>
         <p>Temukan berbagai produk berkualitas tinggi dengan penawaran harga terbaik.</p>
+    </section>
+
+    <section class="ad-slider-section">
+        <div class="ad-slider-container-inner">
+            <button class="ad-nav-btn ad-prev" onclick="prevAd()">❮</button>
+            <button class="ad-nav-btn ad-next" onclick="nextAd()">❯</button>
+            
+            <div class="ad-slider-wrapper" id="ad-wrapper-box">
+                <div class="ad-img-box" id="ad-media-box">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" id="ad-img" alt="Iklan Produk">
+                </div>
+                <div class="ad-info-box">
+                    <span class="ad-badge">🔥 Promo Unggulan Toko</span>
+                    <div class="ad-title" id="ad-title">Memuat Promo...</div>
+                    <div class="ad-price" id="ad-price">Rp 0</div>
+                    <div class="ad-stock" id="ad-stock">Stok: 0 pcs</div>
+                    <div class="ad-desc" id="ad-desc">Temukan berbagai barang berkualitas dengan penawaran harga terbaik hari ini!</div>
+                    <button class="ad-btn" id="ad-action-btn" onclick="openAdProductDetail()">Lihat Detail & Beli</button>
+                </div>
+            </div>
+
+            <div class="ad-indicators" id="ad-dots-container"></div>
+        </div>
     </section>
 
     <main class="container">
@@ -366,6 +376,7 @@
             { id: 1, name: "Mouse Gaming RGB", price: 150000, stock: 15, mediaList: [{ type: "image", url: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" }] }
         ];
 
+        // Fungsi Aman untuk Memuat Data & Mencegah Media Tertukar/Rusak
         function getProducts() { 
             let stored = localStorage.getItem('toko_products');
             if(!stored) {
@@ -397,6 +408,7 @@
         function getCart() { return JSON.parse(localStorage.getItem('toko_cart')) || []; }
         function saveCart(c) { localStorage.setItem('toko_cart', JSON.stringify(c)); }
 
+        // Sinkronisasi Multi-Tab secara Real-Time
         window.addEventListener('storage', function(e) {
             if (e.key === 'toko_products') {
                 renderProducts();
@@ -416,7 +428,7 @@
         let previewMediaList = [];
         let previewMediaIdx = 0;
 
-        // Kontrol Slider Iklan Interaktif
+        // Kontrol Slider Iklan Interaktif (Auto & Manual)
         let currentAdIndex = 0;
         let adTimer = null;
 
@@ -456,6 +468,7 @@
             const mediaBox = document.getElementById("ad-media-box");
             const adTitle = document.getElementById("ad-title");
             const adPrice = document.getElementById("ad-price");
+            const adStock = document.getElementById("ad-stock");
             const adDesc = document.getElementById("ad-desc");
             const wrapperBox = document.getElementById("ad-wrapper-box");
 
@@ -471,9 +484,10 @@
 
                 adTitle.innerText = p.name;
                 adPrice.innerText = "Rp " + p.price.toLocaleString('id-ID');
-                adDesc.innerText = "Sisa Stok: " + p.stock + " pcs. Amankan produk pilihan terbaik ini sebelum kehabisan!";
+                adStock.innerText = "Stok Tersedia: " + p.stock + " pcs";
+                adDesc.innerText = "Dapatkan produk unggulan berkualitas ini sekarang juga sebelum kehabisan di Toko Ucen Jaya!";
                 wrapperBox.style.opacity = 1;
-            }, 250);
+            }, 200);
 
             updateAdDotsActive();
         }
@@ -580,7 +594,6 @@
                     </div>
                 `;
             });
-            initAdSlider();
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -811,6 +824,7 @@
             closeModal('cart-modal');
             document.getElementById("checkout-form").reset();
             renderProducts();
+            initAdSlider();
 
             alert("🎉 Pesanan Berhasil!\nNomor Pesanan: " + newOrder.orderId + "\nTotal: Rp " + totalAmount.toLocaleString('id-ID') + "\nPesanan atas nama " + name + " telah dikirim ke Admin!");
         }
