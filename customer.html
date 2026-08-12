@@ -8,7 +8,63 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { width: 100%; min-height: 100vh; background-color: #f8f9fa; color: #222; overflow-x: hidden; }
         
-        .marquee-container { background: #f97316; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 6px 0; width: 100%; }
+        /* Styling Banner Iklan Bergerak Otomatis (Slideshow) */
+        .ad-banner-container {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: #fff;
+            padding: 12px 20px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            border-bottom: 2px solid #f97316;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .ad-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .ad-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #f97316;
+            flex-shrink: 0;
+            background: #000;
+        }
+        .ad-text-area {
+            flex: 1;
+        }
+        .ad-badge {
+            background: #f97316;
+            color: #fff;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 3px;
+        }
+        .ad-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .ad-desc {
+            font-size: 11px;
+            color: #d1d5db;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
         header { 
             background: #fff; border-bottom: 1px solid #e5e7eb; padding: 15px 5%; 
@@ -112,10 +168,15 @@
 </head>
 <body>
 
-    <div class="marquee-container">
-        <marquee behavior="scroll" direction="left" scrollamount="5">
-            ✦ SELAMAT DATANG DI TOKO UCEN JAYA ✦ PUSAT BELANJA ONLINE TERPERCAYA ✦
-        </marquee>
+    <div class="ad-banner-container" id="ad-banner">
+        <div class="ad-content" id="ad-content-box">
+            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" class="ad-thumb" id="ad-img">
+            <div class="ad-text-area">
+                <span class="ad-badge">🔥 Promo Unggulan</span>
+                <div class="ad-title" id="ad-title">Selamat Datang di Toko Ucen Jaya</div>
+                <div class="ad-desc" id="ad-desc">Temukan berbagai barang berkualitas dengan harga terbaik hari ini!</div>
+            </div>
+        </div>
     </div>
 
     <header>
@@ -232,7 +293,6 @@
                 let parsed = JSON.parse(stored);
                 if(!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PRODUCTS;
                 
-                // Normalisasi data produk agar selalu memiliki struktur mediaList yang valid
                 return parsed.map(p => {
                     let mList = [];
                     if (p.mediaList && Array.isArray(p.mediaList) && p.mediaList.length > 0) {
@@ -257,6 +317,7 @@
         window.addEventListener('storage', function(e) {
             if (e.key === 'toko_products') {
                 renderProducts();
+                initAdSlider();
             }
         });
 
@@ -272,7 +333,49 @@
         let previewMediaList = [];
         let previewMediaIdx = 0;
 
-        window.onload = function() { renderProducts(); updateCartBadge(); };
+        window.onload = function() { 
+            renderProducts(); 
+            updateCartBadge(); 
+            initAdSlider();
+        };
+
+        // Fungsi Iklan Bergerak Otomatis (Slideshow berganti tiap 4 detik berdasarkan produk toko)
+        let adInterval = null;
+        function initAdSlider() {
+            let products = getProducts();
+            if (products.length === 0) return;
+
+            let index = 0;
+            const adImg = document.getElementById("ad-img");
+            const adTitle = document.getElementById("ad-title");
+            const adDesc = document.getElementById("ad-desc");
+            const adContentBox = document.getElementById("ad-content-box");
+
+            function showNextAd() {
+                let p = products[index];
+                let mediaUrl = (p.mediaList && p.mediaList.length > 0) ? p.mediaList[0].url : FALLBACK_IMG;
+                
+                // Jika berupa link video atau youtube/tiktok, berikan fallback gambar agar tetap rapi di banner
+                if(mediaUrl.includes('youtube') || mediaUrl.includes('youtu.be') || mediaUrl.includes('tiktok') || mediaUrl.includes('mp4')) {
+                    mediaUrl = FALLBACK_IMG;
+                }
+
+                // Efek animasi transisi
+                adContentBox.style.opacity = 0;
+                setTimeout(() => {
+                    adImg.src = mediaUrl;
+                    adTitle.innerText = `PROMO: ${p.name}`;
+                    adDesc.innerText = `Harga Terbaik: Rp ${p.price.toLocaleString('id-ID')} | Sisa Stok: ${p.stock} pcs. Yuk Beli Sekarang!`;
+                    adContentBox.style.opacity = 1;
+                }, 300);
+
+                index = (index + 1) % products.length;
+            }
+
+            showNextAd();
+            if (adInterval) clearInterval(adInterval);
+            adInterval = setInterval(showNextAd, 4000); // Ganti iklan setiap 4 detik
+        }
 
         function renderProducts(list = null) {
             const products = list || getProducts();
