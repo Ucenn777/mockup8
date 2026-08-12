@@ -392,11 +392,20 @@
             }
         }
 
+        // PERUBAHAN UTAMA: Pendapatan hanya dihitung jika status pesanan "Selesai"
         function renderDashboardStats() {
             let products = getProducts();
             let orders = getOrders();
             document.getElementById('stat-total-prod').innerText = products.length;
-            let totalRev = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+            
+            let totalRev = orders.reduce((sum, o) => {
+                let status = o.status || 'Pending';
+                if (status === 'Selesai') {
+                    return sum + (o.total || 0);
+                }
+                return sum;
+            }, 0);
+
             document.getElementById('stat-total-rev').innerText = "Rp " + totalRev.toLocaleString('id-ID');
         }
 
@@ -422,12 +431,10 @@
             });
         }
 
-        // --- PARSER PINTAR: Mendukung YouTube, YouTube Shorts, & TikTok ---
         function getEmbedMediaHtmlAdmin(media, cssClass) {
             let url = media.url || "";
             let type = media.type;
 
-            // 1. Deteksi YouTube & YouTube Shorts
             if (url.includes("youtube.com") || url.includes("youtu.be")) {
                 let videoId = "";
                 if (url.includes("shorts/")) {
@@ -446,7 +453,6 @@
                 }
             }
 
-            // 2. Deteksi TikTok
             if (url.includes("tiktok.com")) {
                 let tiktokEmbedUrl = `https://www.tiktok.com/embed/v2/${url.split('/video/')[1]?.split('?')[0] || ''}`;
                 if (url.includes('/video/')) {
@@ -455,12 +461,10 @@
                 return `<iframe src="${url}" class="${cssClass}" allowfullscreen></iframe>`;
             }
 
-            // 3. File Video Lokal (.mp4 dll)
             if (type === 'video' || url.endsWith('.mp4') || url.includes('video')) {
                 return `<video src="${url}" class="${cssClass}" controls playsinline></video>`;
             }
 
-            // 4. Gambar Default
             return `<img src="${url}" class="${cssClass}" onerror="this.src='${FALLBACK_IMG}'">`;
         }
 
@@ -735,6 +739,7 @@
                 ord.status = newStatus;
                 saveOrders(orders);
                 renderAdminOrders();
+                renderDashboardStats(); // Memperbarui statistik pendapatan secara real-time
             }
         }
     </script>
