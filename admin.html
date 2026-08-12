@@ -357,8 +357,15 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                alert("Penyimpanan penuh, namun data tetap diproses.");
-                return true;
+                // Penanganan otomatis jika penyimpanan hampir penuh
+                try {
+                    localStorage.removeItem('toko_cart');
+                    localStorage.setItem('toko_products', JSON.stringify(p));
+                    return true;
+                } catch (err) {
+                    alert("Penyimpanan memori browser penuh! Disarankan menggunakan link URL eksternal (seperti ImgBB/Google Drive) untuk video atau file berukuran sangat besar.");
+                    return true;
+                }
             }
         }
 
@@ -535,16 +542,22 @@
             document.getElementById("editModal").style.display = "none";
         }
 
+        // PERBAIKAN: Menggunakan URL.createObjectURL agar file galeri (terutama video/foto besar) tidak membebani localStorage
         async function processFile(file) {
             return new Promise((resolve) => {
-                let reader = new FileReader();
                 let fileType = file.type.toLowerCase();
                 let isVideo = fileType.includes('video') || file.name.toLowerCase().endsWith('.mp4');
                 
-                reader.onload = function(e) {
-                    resolve({ type: isVideo ? 'video' : 'image', url: e.target.result });
-                };
-                reader.readAsDataURL(file);
+                if (isVideo || file.size > 500 * 1024) {
+                    let objectUrl = URL.createObjectURL(file);
+                    resolve({ type: isVideo ? 'video' : 'image', url: objectUrl });
+                } else {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        resolve({ type: 'image', url: e.target.result });
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
 
