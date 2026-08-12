@@ -132,6 +132,68 @@
             line-height: 1.4; 
         }
 
+        /* Form Login Admin Modal / Hidden Box */
+        .admin-form-container {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #374151;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #ea580c;
+        }
+
+        .btn-submit {
+            background: #ea580c;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .btn-submit:hover {
+            background: #c2410c;
+        }
+
+        .btn-back {
+            background: #6b7280;
+            color: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
         .footer-note { 
             text-align: center; 
             font-size: 10px; 
@@ -163,8 +225,8 @@
             <p>Belanja lebih mudah, cepat, dan aman.<br>Silakan masuk sebagai Customer atau Admin.</p>
         </div>
 
-        <div class="options-side">
-            <div class="options-title">Pilih Jenis Login</div>
+        <div class="options-side" id="options-box">
+            <div class="options-title" id="box-title">Pilih Jenis Login</div>
 
             <a href="customer.html" class="role-card">
                 <div class="role-icon">👤</div>
@@ -174,17 +236,60 @@
                 </div>
             </a>
 
-            <a href="admin.html" class="role-card">
+            <div class="role-card" onclick="showAdminForm()">
                 <div class="role-icon">🛡️</div>
                 <div class="role-info">
                     <h3>Login Admin</h3>
                     <p>Masuk ke Dashboard Admin untuk mengelola produk, kategori, customer dan pesanan.</p>
                 </div>
-            </a>
+            </div>
 
             <div class="footer-note">&copy; 2026 TOKO UCEN JAYA</div>
         </div>
+
+        <div class="options-side" id="admin-form-box" style="display: none;">
+            <div class="options-title">🔐 Masukkan Akun Admin</div>
+            <form onsubmit="handleAdminLogin(event)">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Nickname Admin (Bebas)</label>
+                    <input type="text" id="admin-nick" required placeholder="Contoh: AdminUcen">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Password (Tampil Langsung di Kotak)</label>
+                    <input type="text" id="admin-pass" required value="admin123">
+                </div>
+                <button type="submit" class="btn-submit">Masuk Dashboard</button>
+                <button type="button" class="btn-back" onclick="hideAdminForm()" style="margin-top: 8px; width: 100%;">Kembali</button>
+            </form>
+            <div class="footer-note">&copy; 2026 TOKO UCEN JAYA</div>
+        </div>
     </div>
+
+    <script>
+        function showAdminForm() {
+            document.getElementById('options-box').style.display = 'none';
+            document.getElementById('admin-form-box').style.display = 'flex';
+        }
+
+        function hideAdminForm() {
+            document.getElementById('admin-form-box').style.display = 'none';
+            document.getElementById('options-box').style.display = 'flex';
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            let nick = document.getElementById('admin-nick').value.trim();
+            let pass = document.getElementById('admin-pass').value.trim();
+
+            // Nickname bebas (apa saja diterima), password wajib bernilai "admin123" agar guru tahu
+            if(nick !== "" && pass === "admin123") {
+                alert(`Login Berhasil! Selamat datang, ${nick}.`);
+                window.location.href = "admin.html";
+            } else {
+                alert("Password harus diisi 'admin123' agar sesuai ketentuan guru!");
+            }
+        }
+    </script>
 
 </body>
 </html>
