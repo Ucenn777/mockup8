@@ -250,9 +250,9 @@
                     <input type="file" id="new-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
                 </div>
                 <div class="form-group">
-                    <label>Atau Masukkan Link URL YouTube / Video Lainnya</label>
-                    <input type="text" id="new-url" placeholder="https://www.youtube.com/watch?v=...">
-                    <small style="color: #6b7280; font-size: 10px; display: block;">Mendukung link YouTube (watch / youtu.be) dan file video lainnya.</small>
+                    <label>Link Video (YouTube, YouTube Shorts, atau TikTok)</label>
+                    <input type="text" id="new-url" placeholder="https://youtube.com/shorts/... atau https://tiktok.com/...">
+                    <small style="color: #6b7280; font-size: 10px; display: block;">Mendukung video panjang, YouTube Shorts, dan link TikTok.</small>
                 </div>
                 <button type="submit" class="btn-primary" id="btn-submit-prod">Simpan Produk Baru</button>
             </form>
@@ -281,7 +281,7 @@
                     <input type="file" id="edit-files" accept="image/*,video/*" multiple style="padding: 6px; cursor: pointer;">
                 </div>
                 <div class="form-group">
-                    <label>Atau Tambah Link URL YouTube Baru</label>
+                    <label>Link Video Baru (YouTube / Shorts / TikTok)</label>
                     <input type="text" id="edit-url" placeholder="https://...">
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 15px;">
@@ -349,7 +349,7 @@
                 localStorage.setItem('toko_products', JSON.stringify(p));
                 return true;
             } catch (e) {
-                alert("Penyimpanan memori browser penuh! Disarankan menggunakan link URL YouTube eksternal.");
+                alert("Penyimpanan memori browser penuh! Disarankan menggunakan link URL video.");
                 return true;
             }
         }
@@ -422,14 +422,17 @@
             });
         }
 
-        // --- PERBAIKAN PEMUTAR YOUTUBE AGAR MUNCUL & BISA DIPUTAR DI HP ---
+        // --- PARSER PINTAR: Mendukung YouTube, YouTube Shorts, & TikTok ---
         function getEmbedMediaHtmlAdmin(media, cssClass) {
             let url = media.url || "";
             let type = media.type;
 
+            // 1. Deteksi YouTube & YouTube Shorts
             if (url.includes("youtube.com") || url.includes("youtu.be")) {
                 let videoId = "";
-                if (url.includes("youtu.be/")) {
+                if (url.includes("shorts/")) {
+                    videoId = url.split("shorts/")[1]?.split("?")[0];
+                } else if (url.includes("youtu.be/")) {
                     videoId = url.split("youtu.be/")[1]?.split("?")[0];
                 } else if (url.includes("watch?v=")) {
                     videoId = url.split("watch?v=")[1]?.split("&")[0];
@@ -443,10 +446,21 @@
                 }
             }
 
+            // 2. Deteksi TikTok
+            if (url.includes("tiktok.com")) {
+                let tiktokEmbedUrl = `https://www.tiktok.com/embed/v2/${url.split('/video/')[1]?.split('?')[0] || ''}`;
+                if (url.includes('/video/')) {
+                    return `<iframe src="${tiktokEmbedUrl}" class="${cssClass}" allow="encrypted-media;" allowfullscreen></iframe>`;
+                }
+                return `<iframe src="${url}" class="${cssClass}" allowfullscreen></iframe>`;
+            }
+
+            // 3. File Video Lokal (.mp4 dll)
             if (type === 'video' || url.endsWith('.mp4') || url.includes('video')) {
                 return `<video src="${url}" class="${cssClass}" controls playsinline></video>`;
             }
 
+            // 4. Gambar Default
             return `<img src="${url}" class="${cssClass}" onerror="this.src='${FALLBACK_IMG}'">`;
         }
 
@@ -462,11 +476,11 @@
                 let mediaList = p.mediaList && p.mediaList.length > 0 ? p.mediaList : [{ type: 'image', url: FALLBACK_IMG }];
                 let firstMedia = mediaList[0];
                 
-                let isVideo = firstMedia.url.includes('youtube') || firstMedia.url.includes('youtu.be') || firstMedia.type === 'video';
+                let isVideo = firstMedia.url.includes('youtube') || firstMedia.url.includes('youtu.be') || firstMedia.url.includes('tiktok') || firstMedia.type === 'video';
                 let mediaElement = "";
 
                 if(isVideo) {
-                    mediaElement = `<div style="width:50px; height:50px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:9px; font-weight:bold; border:1px solid #f97316;">YT / VID</div>`;
+                    mediaElement = `<div style="width:50px; height:50px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:9px; font-weight:bold; border:1px solid #f97316;">VIDEO</div>`;
                 } else {
                     mediaElement = `<img src="${firstMedia.url}" width="50" height="50" style="object-fit:cover; border-radius:4px;" onerror="this.src='${FALLBACK_IMG}'">`;
                 }
@@ -588,7 +602,7 @@
             }
 
             if(urlInput) {
-                let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('video');
+                let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('tiktok') || urlInput.includes('video');
                 newMediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
             }
 
@@ -639,7 +653,7 @@
                 }
 
                 if(urlInput) {
-                    let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('video');
+                    let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('tiktok') || urlInput.includes('video');
                     mediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
                 }
 
