@@ -422,12 +422,11 @@
             });
         }
 
-        // --- PERBAIKAN UTAMA: Parsing & Embed Media / YouTube yang Akurat ---
+        // --- PERBAIKAN PEMUTAR YOUTUBE AGAR MUNCUL & BISA DIPUTAR DI HP ---
         function getEmbedMediaHtmlAdmin(media, cssClass) {
             let url = media.url || "";
             let type = media.type;
 
-            // Deteksi link YouTube secara menyeluruh (watch, youtu.be, embed)
             if (url.includes("youtube.com") || url.includes("youtu.be")) {
                 let videoId = "";
                 if (url.includes("youtu.be/")) {
@@ -439,13 +438,13 @@
                 }
                 
                 if (videoId) {
-                    let embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                    return `<iframe src="${embedUrl}" class="${cssClass}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                    let embedUrl = `https://www.youtube.com/embed/${videoId}?playsinline=1&enablejsapi=1`;
+                    return `<iframe src="${embedUrl}" class="${cssClass}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
                 }
             }
 
             if (type === 'video' || url.endsWith('.mp4') || url.includes('video')) {
-                return `<video src="${url}" class="${cssClass}" controls></video>`;
+                return `<video src="${url}" class="${cssClass}" controls playsinline></video>`;
             }
 
             return `<img src="${url}" class="${cssClass}" onerror="this.src='${FALLBACK_IMG}'">`;
@@ -588,7 +587,6 @@
                 }
             }
 
-            // --- PERBAIKAN VALIDASI URL PADA EDIT ---
             if(urlInput) {
                 let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('video');
                 newMediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
@@ -640,7 +638,6 @@
                     mediaList.push(mediaObj);
                 }
 
-                // --- PERBAIKAN VALIDASI URL PADA TAMBAH PRODUK ---
                 if(urlInput) {
                     let isUrlVideo = urlInput.includes('mp4') || urlInput.includes('youtube') || urlInput.includes('youtu.be') || urlInput.includes('video');
                     mediaList.push({ type: isUrlVideo ? 'video' : 'image', url: urlInput });
