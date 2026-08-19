@@ -125,7 +125,6 @@
 
         .product-img-wrap { width: 100%; height: 140px; overflow: hidden; border-radius: 6px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
         
-        /* Menggunakan contain agar video pendek/vertikal (Shorts/TikTok) terlihat utuh */
         .product-img, .product-video, .product-iframe { width: 100%; height: 100%; object-fit: contain; border: none; pointer-events: none; background: #000; }
 
         .product-name { font-size: 11px; font-weight: bold; margin: 6px 0 3px 0; color: #1f2937; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 28px; }
@@ -163,6 +162,10 @@
         .form-group textarea { resize: vertical; height: 50px; }
 
         .btn-primary { background: #f97316; color: #fff; border: none; padding: 9px; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 100%; }
+
+        /* Floating Chat Button */
+        .chat-float-btn { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: #fff; padding: 10px 18px; border-radius: 30px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); z-index: 999; border: none; display: flex; align-items: center; gap: 5px; }
+        .chat-float-btn:hover { background: #059669; }
 
         .order-history-section {
             background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-top: 20px;
@@ -228,6 +231,32 @@
             </div>
         </div>
     </main>
+
+    <!-- Tombol Chat Bantuan Melayang -->
+    <button class="chat-float-btn" onclick="openModal('chatModal')">💬 Bantuan</button>
+
+    <!-- Modal Chat Pelanggan -->
+    <div class="modal-overlay" id="chatModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('chatModal')">&times;</button>
+            <h3 style="margin-bottom: 10px; font-size: 13px;">Kirim Pesan ke Admin</h3>
+            <form onsubmit="sendCustomerChat(event)">
+                <div class="form-group">
+                    <label>Nama Anda</label>
+                    <input type="text" id="chat-name" required placeholder="Nama lengkap...">
+                </div>
+                <div class="form-group">
+                    <label>No. WhatsApp</label>
+                    <input type="tel" id="chat-phone" required placeholder="08xxxxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>Pesan / Kendala</label>
+                    <textarea id="chat-msg" required placeholder="Tuliskan pesan Anda..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Kirim Pesan</button>
+            </form>
+        </div>
+    </div>
 
     <div class="preview-modal" id="previewModal">
         <div class="preview-content">
@@ -348,12 +377,10 @@
             renderCustomerOrders();
         };
 
-        // Fungsi Super Pintar: Mendukung YouTube Panjang, YouTube Shorts, & TikTok secara Sempurna
         function getEmbedMediaHtml(media, cssClass) {
             let url = media.url || "";
             let type = media.type;
 
-            // 1. Deteksi Link YouTube (Panjang / Shorts / Embed)
             if (url.includes("youtube.com") || url.includes("youtu.be")) {
                 let videoId = "";
                 if (url.includes("youtu.be/")) {
@@ -372,7 +399,6 @@
                 }
             }
 
-            // 2. Deteksi Link TikTok (Format Web / Mobile / Player ID)
             if (url.includes("tiktok.com")) {
                 let tiktokId = "";
                 if (url.includes("/video/")) {
@@ -387,12 +413,10 @@
                 }
             }
 
-            // 3. Deteksi Format Video File Lokal / MP4 Langsung
             if (type === 'video' || url.endsWith('.mp4') || url.includes('video')) {
                 return `<video src="${url}" class="${cssClass}" controls autoplay muted loop></video>`;
             }
 
-            // 4. Default Gambar (Fallback)
             return `<img src="${url}" class="${cssClass}" onerror="this.src='${FALLBACK_IMG}'">`;
         }
 
@@ -756,6 +780,27 @@
                     </div>
                 `;
             });
+        }
+
+        function sendCustomerChat(e) {
+            e.preventDefault();
+            let name = document.getElementById('chat-name').value;
+            let phone = document.getElementById('chat-phone').value;
+            let message = document.getElementById('chat-msg').value;
+
+            let chats = JSON.parse(localStorage.getItem('toko_chats')) || [];
+            chats.unshift({
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                message: message,
+                date: new Date().toLocaleString('id-ID')
+            });
+
+            localStorage.setItem('toko_chats', JSON.stringify(chats));
+            alert("Pesan berhasil dikirim ke Admin!");
+            document.getElementById('chat-msg').value = "";
+            closeModal('chatModal');
         }
 
         function searchProducts() {
